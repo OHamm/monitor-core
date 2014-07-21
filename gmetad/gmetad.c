@@ -406,7 +406,7 @@ main ( int argc, char *argv[] )
    struct passwd *pw;
    gmetad_config_t *c = &gmetad_config;
    apr_interval_time_t sleep_time;
-   apr_time_t last_metadata;
+   apr_time_t last_metadata, before_sum, after_sum;
    double random_sleep_factor;
    unsigned int rand_seed;
 
@@ -631,7 +631,8 @@ main ( int argc, char *argv[] )
     /* Meta data */
    last_metadata = apr_time_now();
    for(;;)
-      {
+   {
+         ganglia_scoreboard_inc(INTER_PROCESSING_SUM_ALL);
          /* Do at a random interval, between 
                  (shortest_step/2) +/- METADATA_SLEEP_RANDOMIZE percent */
          random_sleep_factor = (1 + (METADATA_SLEEP_RANDOMIZE / 50.0) * ((rand_r(&rand_seed) - RAND_MAX/2)/(float)RAND_MAX));
@@ -640,10 +641,12 @@ main ( int argc, char *argv[] )
          if(apr_time_sec(apr_time_now() + sleep_time) < (METADATA_MINIMUM_SLEEP + apr_time_sec(apr_time_now())))
             sleep_time += apr_time_from_sec(METADATA_MINIMUM_SLEEP);
          apr_sleep(sleep_time);
-
+         
          /* Need to be sure root is locked while doing summary */
          pthread_mutex_lock(root.sum_finished);
 
+         //NOTE: Not sure if the sleep should be added in the timing.
+         before_sum = apr_time_now();
          /* Flush the old values */
          hash_foreach(root.metric_summary, zero_out_summary, NULL);
          root.hosts_up = 0;
@@ -657,9 +660,12 @@ main ( int argc, char *argv[] )
 
          /* Save them to RRD */
          hash_foreach(root.metric_summary, write_root_summary, NULL);
-
+         
          /* Remember our last run */
-         last_metadata = apr_time_now();
+         after_sum = apr_time_now();
+         ganglia_scoreboard_incby(INTER_PROCESSING_TIME_SUM_ALL, after_sum - before_sum);
+         ganglia_scoreboard_set(INTER_PROCESSING_LAST_SUM_ALL, after_sum - last_metadata);
+         last_metadata = after_sum;
       }
 
    apr_pool_destroy(global_context);
