@@ -39,13 +39,14 @@ typedef enum ganglia_scoreboard_types ganglia_scoreboard_types;
 #define INTER_POLLS_DUR_RRD "gmetad_internal_polls_dur_rrd"
 #define INTER_POLLS_TIM_RRD "gmetad_internal_polls_tim_rrd"
 
+/* Done by METS_SENT_...
 #define INTER_EXPORTS_NBR_ALL "gmetad_internal_exports_nbr_all"
 #define INTER_EXPORTS_NBR_RRDTOOLS "gmetad_internal_exports_nbr_rrdtools"
 #define INTER_EXPORTS_NBR_RRDCACHED "gmetad_internal_exports_nbr_rrdcached"
 #define INTER_EXPORTS_NBR_GRAPHITE "gmetad_internal_exports_nbr_graphite"
 #define INTER_EXPORTS_NBR_MEMCACHED "gmetad_internal_exports_nbr_memcached"
 #define INTER_EXPORTS_NBR_RIEMANN "gmetad_internal_exports_nbr_riemann"
-
+*/
 #define INTER_EXPORTS_TIME_EXP_ALL "gmetad_internal_exports_nbr_exp_time_all"
 #define INTER_EXPORTS_TIME_EXP_RRDTOOLS "gmetad_internal_exports_nbr_exp_time_rrdtools"
 #define INTER_EXPORTS_TIME_EXP_RRDCACHED "gmetad_internal_exports_nbr_exp_time_rrdcached"
