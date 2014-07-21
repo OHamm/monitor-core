@@ -307,8 +307,11 @@ void initialize_scoreboard()
     ganglia_scoreboard_add(INTER_EXPORTS_LAST_EXP_GRAPHITE, GSB_COUNTER);
     ganglia_scoreboard_add(INTER_EXPORTS_LAST_EXP_MEMCACHED, GSB_COUNTER);
     ganglia_scoreboard_add(INTER_EXPORTS_LAST_EXP_RIEMANN, GSB_COUNTER);
-    /*
 
+    ganglia_scoreboard_add(INTER_PROCESSING_SUM_ALL);
+    ganglia_scoreboard_add(INTER_PROCESSING_TIME_SUM_ALL);
+    ganglia_scoreboard_add(INTER_PROCESSING_LAST_SUM_ALL);
+    /*
      ganglia_scoreboard_add(INTER_IMPORTS_NBR_ALL, GSB_COUNTER);
      ganglia_scoreboard_add(INTER_IMPORTS_NBR_RRDTOOLS, GSB_COUNTER);
      ganglia_scoreboard_add(INTER_IMPORTS_NBR_RRDCACHED, GSB_COUNTER);
@@ -334,9 +337,7 @@ void initialize_scoreboard()
      * #define INTER_REQUESTS_NBR_ALL "gmetad_internal_requests_nbr_all"
      * #define INTER_REQUESTS_SERV_ALL "gmetad_internal_requests_serv_all"
      * 
-     * #define INTER_PROCESSING_SUM_ALL "gmetad_internal_processing_sum_all"
-     * #define INTER_PROCESSING_TIME_SUM_ALL "gmetad_internal_processing_time_sum_all"
-     * #define INTER_PROCESSING_LAST_SUM_ALL "gmetad_internal_processing_last_sum_all"
+     * 
     */
 }
 
