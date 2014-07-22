@@ -122,13 +122,13 @@ reconnect:
 
    while (1)
       {
-         ganglia_scoreboard_inc(INTER_POLLS_NBR_ALL);
-         ganglia_scoreboard_inc(INTER_POLLS_NBR_RRD);
+         ganglia_scoreboard_inc(ALL_POLL_REQS);
+         ganglia_scoreboard_inc(RRD_POLL_REQS);
          apr_time_t now = apr_time_now();
          int r = poll(pfd, 1, 250);
          apr_time_t afternow = apr_time_now();
-         ganglia_scoreboard_incby(INTER_POLLS_DUR_ALL, afternow - now);
-         ganglia_scoreboard_incby(INTER_POLLS_DUR_RRD, afternow - now);
+         ganglia_scoreboard_incby(ALL_POLL_DURATION, afternow - now);
+         ganglia_scoreboard_incby(RRD_POLL_DURATION, afternow - now);
          
          if (r == 0)
             {
@@ -197,7 +197,6 @@ reconnect:
       
     ganglia_scoreboard_incby(INTER_EXPORTS_TIME_EXP_ALL, apr_time_now() - start);
     ganglia_scoreboard_incby(INTER_EXPORTS_TIME_EXP_RRDCACHED, apr_time_now() - start);
-    printf("TIME TAKEN RRDCACHED: %lu\n", apr_time_now() - start);
    return 0;
 }
 
@@ -402,6 +401,5 @@ write_data_to_rrd ( const char *source, const char *host, const char *metric,
    ret = push_data_to_rrd( rrd, sum, num, step, process_time, slope);
    ganglia_scoreboard_incby(INTER_EXPORTS_TIME_EXP_ALL, apr_time_now() - start);
    ganglia_scoreboard_incby(INTER_EXPORTS_TIME_EXP_RRDTOOLS, apr_time_now() - start);
-   printf("TIME TAKEN RRDTOOLS: %lu\n", apr_time_now() - start);
    return ret;
 }

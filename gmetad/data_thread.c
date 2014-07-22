@@ -104,16 +104,16 @@ data_thread ( void *arg )
          read_index = 0;
          for(;;)
             {
-               ganglia_scoreboard_inc(INTER_POLLS_NBR_ALL);
-               ganglia_scoreboard_inc(INTER_POLLS_NBR_DATA);
+               ganglia_scoreboard_inc(ALL_POLL_REQS);
+               ganglia_scoreboard_inc(DATA_POLL_REQS);
                apr_time_t now = apr_time_now();
                /* Timeout set to 10 seconds */
                rval = poll( &struct_poll, 1, 10000);
                apr_time_t afternow = apr_time_now();
-               ganglia_scoreboard_incby(INTER_POLLS_DUR_ALL, afternow - now);
-               ganglia_scoreboard_incby(INTER_POLLS_DUR_DATA, afternow - now);
-               ganglia_scoreboard_set(INTER_POLLS_TIM_ALL, (last_poll != 0 ? now - last_poll : 0));
-               ganglia_scoreboard_set(INTER_POLLS_TIM_DATA, (last_poll != 0 ? now - last_poll : 0));
+               ganglia_scoreboard_incby(ALL_POLL_DURATION, afternow - now);
+               ganglia_scoreboard_incby(DATA_POLL_DURATION, afternow - now);
+               ganglia_scoreboard_set(ALL_POLL_LAST_TIME, (last_poll != 0 ? now - last_poll : 0));
+               ganglia_scoreboard_set(DATA_POLL_LAST_TIME, (last_poll != 0 ? now - last_poll : 0));
                last_poll = now;
                if( rval < 0 )
                   {
