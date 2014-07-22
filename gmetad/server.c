@@ -712,7 +712,7 @@ status_report( client_t *client , char *callback)
        "\"num\":%u,"
        "\"totalMillis\":%u,"
        "\"lastTime\":%u"
-       "},"
+       "}"
        "},"
        "\"summarize\":{"
        "\"num\":%u,"
@@ -753,7 +753,7 @@ status_report( client_t *client , char *callback)
        "\"num\":%u,"
        "\"totalMillis\":%u,"
        "\"lastTime\":%u"
-       "},"
+       "}"
        "},"
        ,
        callback != NULL ? callback : "",
