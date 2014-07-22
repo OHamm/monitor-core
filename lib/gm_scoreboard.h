@@ -83,7 +83,11 @@ typedef enum ganglia_scoreboard_types ganglia_scoreboard_types;
 #define INTER_IMPORTS_LAST_EXP_RIEMANN "gmetad_internal_imports_nbr_last_exp_riemann"
 
 #define INTER_REQUESTS_NBR_ALL "gmetad_internal_requests_nbr_all"
-#define INTER_REQUESTS_SERV_ALL "gmetad_internal_requests_serv_all"
+#define INTER_REQUESTS_TIME_ALL "gmetad_internal_requests_time_all"
+#define NBR_TCP_REQS_XML "nbr_tcp_reqs_xml"
+#define TIME_TCP_REQS_XML "time_tcp_reqs_xml"
+#define NBR_TCP_REQS_INTXML "nbr_tcp_reqs_intxml"
+#define TIME_TCP_REQS_INTXML "time_tcp_reqs_intxml"
 
 #define INTER_PROCESSING_SUM_ALL "gmetad_internal_processing_sum_all"
 #define INTER_PROCESSING_TIME_SUM_ALL "gmetad_internal_processing_time_sum_all"

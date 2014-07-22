@@ -311,6 +311,16 @@ void initialize_scoreboard()
     ganglia_scoreboard_add(INTER_PROCESSING_SUM_ALL, GSB_COUNTER);
     ganglia_scoreboard_add(INTER_PROCESSING_TIME_SUM_ALL, GSB_COUNTER);
     ganglia_scoreboard_add(INTER_PROCESSING_LAST_SUM_ALL, GSB_COUNTER);
+    
+    ganglia_scoreboard_add(INTER_REQUESTS_NBR_ALL, GSB_COUNTER);
+    ganglia_scoreboard_add(INTER_REQUESTS_TIME_ALL, GSB_COUNTER);
+
+    ganglia_scoreboard_add(NBR_TCP_REQS_XML, GSB_COUNTER);
+    ganglia_scoreboard_add(TIME_TCP_REQS_XML, GSB_COUNTER);
+    ganglia_scoreboard_add(NBR_TCP_REQS_INTXML, GSB_COUNTER);
+    ganglia_scoreboard_add(TIME_TCP_REQS_INTXML, GSB_COUNTER);
+    
+    
     /*
      ganglia_scoreboard_add(INTER_IMPORTS_NBR_ALL, GSB_COUNTER);
      ganglia_scoreboard_add(INTER_IMPORTS_NBR_RRDTOOLS, GSB_COUNTER);
@@ -333,8 +343,6 @@ void initialize_scoreboard()
     ganglia_scoreboard_add(INTER_IMPORTS_LAST_EXP_MEMCACHED, GSB_COUNTER);
     ganglia_scoreboard_add(INTER_IMPORTS_LAST_EXP_RIEMANN, GSB_COUNTER);
     
-    ganglia_scoreboard_add(INTER_REQUESTS_NBR_ALL, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_REQUESTS_SERV_ALL, GSB_COUNTER);
     */
 }
 

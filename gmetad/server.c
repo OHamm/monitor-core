@@ -1065,23 +1065,29 @@ server_thread (void *arg)
    char request[REQUESTLEN + 1];
    llist_entry *le;
    datum_t rootdatum;
+   apr_time_t now = 0, afternow;
 
    for (;;)
       {
          client.valid = 0;
          len = sizeof(client.addr);
-
          if (interactive)
             {
                pthread_mutex_lock(&server_interactive_mutex);
                SYS_CALL( client.fd, accept(interactive_socket->sockfd, (struct sockaddr *) &(client.addr), &len));
                pthread_mutex_unlock(&server_interactive_mutex);
+               ganglia_scoreboard_inc(INTER_REQUESTS_NBR_ALL);
+               ganglia_scoreboard_inc(NBR_TCP_REQS_INTXML);
+               now = apr_time_now();
             }
          else
-            {
+         {
                pthread_mutex_lock  ( &server_socket_mutex );
                SYS_CALL( client.fd, accept(server_socket->sockfd, (struct sockaddr *) &(client.addr), &len));
                pthread_mutex_unlock( &server_socket_mutex );
+               ganglia_scoreboard_inc(INTER_REQUESTS_NBR_ALL);
+               ganglia_scoreboard_inc(NBR_TCP_REQS_XML);
+               now = apr_time_now();
             }
          if ( client.fd < 0 )
             {
@@ -1122,8 +1128,10 @@ server_thread (void *arg)
                      continue;
                   }
                debug_msg("server_thread() received request \"%s\" from %s", request, remote_ip);
-
                rc = process_request(&client, request);
+               afternow = apr_time_now();
+               ganglia_scoreboard_set(INTER_REQUESTS_TIME_ALL, afternow - now);//Port 8652
+               ganglia_scoreboard_set(TIME_TCP_REQS_INTXML, afternow - now);
                if (rc == 1)
                   {
                      err_msg("Got a malformed path request from %s", remote_ip);
@@ -1137,8 +1145,10 @@ server_thread (void *arg)
                      continue;
                   }
             }
-         else
-            strcpy(request, "/");
+         else{
+             ganglia_scoreboard_inc(INTER_REQUESTS_NBR_ALL);
+             strcpy(request, "/");
+         }
 
          if(root_report_start(&client))
             {
@@ -1159,6 +1169,11 @@ server_thread (void *arg)
                close(client.fd);
                continue;
             }
+            else{
+                afternow = apr_time_now();
+                ganglia_scoreboard_set(INTER_REQUESTS_TIME_ALL, afternow - now);//Port 8651
+                ganglia_scoreboard_set(TIME_TCP_REQS_XML, afternow - now);
+         }
 
          if(root_report_end(&client))
             {
