@@ -23,21 +23,21 @@ typedef enum ganglia_scoreboard_types ganglia_scoreboard_types;
 #define METS_SENT_RIEMANN "gmetad_metrics_sent_riemann"
 
 /* predefined gmetad scoreboard internal elements */
-#define INTER_POLLS_NBR_ALL "gmetad_internal_polls_nbr_all"
-#define INTER_POLLS_DUR_ALL "gmetad_internal_polls_dur_all"
-#define INTER_POLLS_TIM_ALL "gmetad_internal_polls_tim_all"
+#define ALL_POLL_REQS "all_poll_reqs"
+#define ALL_POLL_DURATION "all_poll_duration"
+#define ALL_POLL_LAST_TIME "all_poll_last_time"
 
-#define INTER_POLLS_NBR_DATA "gmetad_internal_polls_nbr_data"
-#define INTER_POLLS_DUR_DATA "gmetad_internal_polls_dur_data"
-#define INTER_POLLS_TIM_DATA "gmetad_internal_polls_tim_data"
+#define DATA_POLL_REQS "data_poll_reqs"
+#define DATA_POLL_DURATION "data_poll_duration"
+#define DATA_POLL_LAST_TIME "data_poll_last_time"
 
-#define INTER_POLLS_NBR_CARBON "gmetad_internal_polls_nbr_carbon"
-#define INTER_POLLS_DUR_CARBON "gmetad_internal_polls_dur_carbon"
-#define INTER_POLLS_TIM_CARBON "gmetad_internal_polls_tim_carbon"
+#define CARBON_POLL_REQS "carbon_poll_reqs"
+#define CARBON_POLL_DURATION "carbon_poll_duration"
+#define CARBON_POLL_LAST_TIME "carbon_poll_last_time"
 
-#define INTER_POLLS_NBR_RRD "gmetad_internal_polls_nbr_rrd"
-#define INTER_POLLS_DUR_RRD "gmetad_internal_polls_dur_rrd"
-#define INTER_POLLS_TIM_RRD "gmetad_internal_polls_tim_rrd"
+#define RRD_POLL_REQS "rrd_poll_reqs"
+#define RRD_POLL_DURATION "rrd_poll_duration"
+#define RRD_POLL_LAST_TIME "rrd_poll_last_time"
 
 /* Done by METS_SENT_...
 #define INTER_EXPORTS_NBR_ALL "gmetad_internal_exports_nbr_all"
