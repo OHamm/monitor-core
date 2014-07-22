@@ -683,12 +683,36 @@ status_report( client_t *client , char *callback)
        "\"received_all\":%u"
        "},"
        "\"sent\":{"
-       "\"sent_all\":%u,"
-       "\"rrdtool\":%u,"
-       "\"rrdcached\":%u,"
-       "\"graphite\":%u,"
-       "\"memcached\":%u,"
-       "\"riemann\":%u"
+       "\"all\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u,"
+       "\"lastTime\":%u"
+       "},"
+       "\"rrdtool\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u,"
+       "\"lastTime\":%u"
+       "},"
+       "\"rrdcached\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u,"
+       "\"lastTime\":%u"
+       "},"
+       "\"graphite\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u,"
+       "\"lastTime\":%u"
+       "},"
+       "\"memcached\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u,"
+       "\"lastTime\":%u"
+       "},"
+       "\"riemann\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u,"
+       "\"lastTime\":%u"
+       "},"
        "},"
        "\"summarize\":{"
        "\"num\":%u,"
@@ -696,19 +720,42 @@ status_report( client_t *client , char *callback)
        "\"lastTime\":%lu"
        "},"
        "\"requests\":{"
-       "\"requests_all\":{"
+       "\"all\":{"
        "\"num\":%u,"
-       "\"lastTime\":%u"
+       "\"totalMillis\":%u"
        "},"
-       "\"requests_interactive\":{"
+       "\"interactive\":{"
        "\"num\":%u,"
-       "\"lastTime\":%u"
+       "\"totalMillis\":%u"
        "},"
-       "\"requests_xml\":{"
+       "\"xml\":{"
        "\"num\":%u,"
-       "\"lastTime\":%u"
+       "\"totalMillis\":%u"
        "}"
-       "},",
+       "},"
+       "\"polls\":{"
+       "\"all\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u,"
+       "\"lastTime\":%u"
+       "},"
+       "\"data\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u,"
+       "\"lastTime\":%u"
+       "},"
+       "\"carbon\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u,"
+       "\"lastTime\":%u"
+       "},"
+       "\"rrd\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u,"
+       "\"lastTime\":%u"
+       "},"
+       "},"
+       ,
        callback != NULL ? callback : "",
        callback != NULL ? "(" : "",
        hostname,
@@ -718,14 +765,27 @@ status_report( client_t *client , char *callback)
        (long int)(started / APR_TIME_C(1000)), // ms
        (long int)((now - started) / APR_USEC_PER_SEC), // seconds
        (long int)((now - started) / APR_TIME_C(1000)), // ms
-       ganglia_scoreboard_get("gmetad_metrics_recvd_all"),
-       ganglia_scoreboard_get("gmetad_metrics_sent_all"),
-       ganglia_scoreboard_get("gmetad_metrics_sent_rrdtool"),
-       ganglia_scoreboard_get("gmetad_metrics_sent_rrdcached"),
-       ganglia_scoreboard_get("gmetad_metrics_sent_graphite"),
-       ganglia_scoreboard_get("gmetad_metrics_sent_memcached"),
-       ganglia_scoreboard_get("gmetad_metrics_sent_riemann"),
-       ganglia_scoreboard_get(METS_SUMRZ_ALL),
+       ganglia_scoreboard_get(METS_RECVD_ALL),
+       
+       ganglia_scoreboard_get(METS_SENT_ALL),
+       ganglia_scoreboard_get(METS_ALL_DURATION),
+       ganglia_scoreboard_get(METS_ALL_LAST_TIME),
+       ganglia_scoreboard_get(METS_SENT_RRDTOOL),
+       ganglia_scoreboard_get(METS_RRDTOOLS_DURATION),
+       ganglia_scoreboard_get(METS_RRDTOOLS_LAST_TIME),
+       ganglia_scoreboard_get(METS_SENT_RRDCACHED),
+       ganglia_scoreboard_get(METS_RRDCACHED_DURATION),
+       ganglia_scoreboard_get(METS_RRDCACHED_LAST_TIME),
+       ganglia_scoreboard_get(METS_SENT_GRAPHITE),
+       ganglia_scoreboard_get(METS_GRAPHITE_DURATION),
+       ganglia_scoreboard_get(METS_GRAPHITE_LAST_TIME),
+       ganglia_scoreboard_get(METS_SENT_MEMCACHED),
+       ganglia_scoreboard_get(METS_MEMCACHED_DURATION),
+       ganglia_scoreboard_get(METS_MEMCACHED_LAST_TIME),
+       ganglia_scoreboard_get(METS_SENT_RIEMANN),
+       ganglia_scoreboard_get(METS_RIEMANN_DURATION),
+       ganglia_scoreboard_get(METS_RIEMANN_LAST_TIME),
+       ganglia_scoreboard_get(METS_SUMRZ_NUM),
        ganglia_scoreboard_get(METS_SUMRZ_DURATION),
        (long int)(last_metadata / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(NBR_TCP_REQS_ALL),
@@ -733,7 +793,19 @@ status_report( client_t *client , char *callback)
        ganglia_scoreboard_get(NBR_TCP_REQS_INTXML),
        ganglia_scoreboard_get(TIME_TCP_REQS_INTXML),
        ganglia_scoreboard_get(NBR_TCP_REQS_XML),
-       ganglia_scoreboard_get(TIME_TCP_REQS_XML)
+       ganglia_scoreboard_get(TIME_TCP_REQS_XML),
+       ganglia_scoreboard_get(ALL_POLL_REQS),
+       ganglia_scoreboard_get(ALL_POLL_DURATION),
+       ganglia_scoreboard_get(ALL_POLL_LAST_TIME),
+       ganglia_scoreboard_get(DATA_POLL_REQS),
+       ganglia_scoreboard_get(DATA_POLL_DURATION),
+       ganglia_scoreboard_get(DATA_POLL_LAST_TIME),
+       ganglia_scoreboard_get(CARBON_POLL_REQS),
+       ganglia_scoreboard_get(CARBON_POLL_DURATION),
+       ganglia_scoreboard_get(CARBON_POLL_LAST_TIME),
+       ganglia_scoreboard_get(RRD_POLL_REQS),
+       ganglia_scoreboard_get(RRD_POLL_DURATION),
+       ganglia_scoreboard_get(RRD_POLL_LAST_TIME)
    );
 
    /* Get local metrics */
