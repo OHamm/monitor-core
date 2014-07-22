@@ -308,9 +308,9 @@ void initialize_scoreboard()
     ganglia_scoreboard_add(INTER_EXPORTS_LAST_EXP_MEMCACHED, GSB_COUNTER);
     ganglia_scoreboard_add(INTER_EXPORTS_LAST_EXP_RIEMANN, GSB_COUNTER);
 
-    ganglia_scoreboard_add(INTER_PROCESSING_SUM_ALL, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_PROCESSING_TIME_SUM_ALL, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_PROCESSING_LAST_SUM_ALL, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_SUMRZ_ALL, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_DURATION, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_LAST_TIME_ALL, GSB_COUNTER);
     
     ganglia_scoreboard_add(INTER_REQUESTS_NBR_ALL, GSB_COUNTER);
     ganglia_scoreboard_add(INTER_REQUESTS_TIME_ALL, GSB_COUNTER);
@@ -638,7 +638,7 @@ main ( int argc, char *argv[] )
    last_metadata = apr_time_now();
    for(;;)
    {
-         ganglia_scoreboard_inc(INTER_PROCESSING_SUM_ALL);
+         ganglia_scoreboard_inc(METS_SUMRZ_ALL);
          /* Do at a random interval, between 
                  (shortest_step/2) +/- METADATA_SLEEP_RANDOMIZE percent */
          random_sleep_factor = (1 + (METADATA_SLEEP_RANDOMIZE / 50.0) * ((rand_r(&rand_seed) - RAND_MAX/2)/(float)RAND_MAX));
@@ -669,8 +669,8 @@ main ( int argc, char *argv[] )
          
          /* Remember our last run */
          after_sum = apr_time_now();
-         ganglia_scoreboard_incby(INTER_PROCESSING_TIME_SUM_ALL, after_sum - before_sum);
-         ganglia_scoreboard_set(INTER_PROCESSING_LAST_SUM_ALL, after_sum - last_metadata);
+         ganglia_scoreboard_incby(METS_DURATION, after_sum - before_sum);
+         ganglia_scoreboard_set(METS_LAST_TIME_ALL, after_sum - last_metadata);
          last_metadata = after_sum;
       }
 
