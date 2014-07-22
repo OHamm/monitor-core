@@ -309,8 +309,8 @@ void initialize_scoreboard()
     ganglia_scoreboard_add(INTER_EXPORTS_LAST_EXP_RIEMANN, GSB_COUNTER);
 
     ganglia_scoreboard_add(METS_SUMRZ_ALL, GSB_COUNTER);
-    ganglia_scoreboard_add(METS_DURATION, GSB_COUNTER);
-    ganglia_scoreboard_add(METS_LAST_TIME_ALL, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_SUMRZ_DURATION, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_SUMRZ_LAST_TIME, GSB_COUNTER);
     
     ganglia_scoreboard_add(INTER_REQUESTS_NBR_ALL, GSB_COUNTER);
     ganglia_scoreboard_add(INTER_REQUESTS_TIME_ALL, GSB_COUNTER);
@@ -669,8 +669,8 @@ main ( int argc, char *argv[] )
          
          /* Remember our last run */
          after_sum = apr_time_now();
-         ganglia_scoreboard_incby(METS_DURATION, after_sum - before_sum);
-         ganglia_scoreboard_set(METS_LAST_TIME_ALL, after_sum - last_metadata);
+         ganglia_scoreboard_incby(METS_SUMRZ_DURATION, after_sum - before_sum);
+         ganglia_scoreboard_set(METS_SUMRZ_LAST_TIME, after_sum - last_metadata);
          last_metadata = after_sum;
       }
 

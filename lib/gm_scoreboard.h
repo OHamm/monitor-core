@@ -90,8 +90,8 @@ typedef enum ganglia_scoreboard_types ganglia_scoreboard_types;
 #define TIME_TCP_REQS_INTXML "time_tcp_reqs_intxml"
 
 #define METS_SUMRZ_ALL "mets_sumrz_all"
-#define METS_DURATION "mets_duration"
-#define METS_LAST_TIME_ALL "mets_last_time"
+#define METS_SUMRZ_DURATION "mets_sumrz_duration"
+#define METS_SUMRZ_LAST_TIME "mets_sumrz_last_time"
 
 /*
 #define INTER_LATENCY_TIME_ALL "gmetad_internal_latency_time_all"

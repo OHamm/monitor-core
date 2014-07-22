@@ -688,6 +688,11 @@ status_report( client_t *client , char *callback)
        "\"graphite\":%u,"
        "\"memcached\":%u,"
        "\"riemann\":%u"
+       "},"
+       "\"summarize\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u,"
+       "\"lastTime\":%u"
        "},",
        callback != NULL ? callback : "",
        callback != NULL ? "(" : "",
@@ -704,7 +709,10 @@ status_report( client_t *client , char *callback)
        ganglia_scoreboard_get("gmetad_metrics_sent_rrdcached"),
        ganglia_scoreboard_get("gmetad_metrics_sent_graphite"),
        ganglia_scoreboard_get("gmetad_metrics_sent_memcached"),
-       ganglia_scoreboard_get("gmetad_metrics_sent_riemann")
+       ganglia_scoreboard_get("gmetad_metrics_sent_riemann"),
+       ganglia_scoreboard_get(METS_SUMRZ_ALL),
+       ganglia_scoreboard_get(METS_SUMRZ_DURATION),
+       ganglia_scoreboard_get(METS_SUMRZ_LAST_TIME)
    );
 
    /* Get local metrics */
