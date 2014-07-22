@@ -22,8 +22,6 @@
 /* Local metrics */
 #include "libmetrics.h"
 
-extern apr_time_t last_metadata;
-
 static const struct metricinfo
 {
   const char *name;
@@ -161,6 +159,7 @@ extern char* getfield(char *buf, short int index);
 extern struct type_tag* in_type_list (char *, unsigned int);
 
 extern apr_time_t started;
+extern apr_time_t last_metadata;
 
 extern char hostname[HOSTNAMESZ];
 
