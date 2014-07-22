@@ -325,8 +325,8 @@ write_data_to_memcached ( const char *cluster, const char *host, const char *met
       memcached_pool_push(memcached_connection_pool, memc);
       ganglia_scoreboard_inc(METS_SENT_MEMCACHED);
       ganglia_scoreboard_inc(METS_SENT_ALL);
-      ganglia_scoreboard_incby(INTER_EXPORTS_TIME_EXP_ALL, apr_time_now() - start);
-      ganglia_scoreboard_incby(INTER_EXPORTS_TIME_EXP_MEMCACHED, apr_time_now() - start);
+      ganglia_scoreboard_incby(METS_ALL_DURATION, apr_time_now() - start);
+      ganglia_scoreboard_incby(METS_MEMCACHED_DURATION, apr_time_now() - start);
       //printf("TIME TAKEN MEMCACHED: %lu\n", apr_time_now() - start);
       return EXIT_SUCCESS;
    }
@@ -482,8 +482,8 @@ write_data_to_carbon ( const char *source, const char *host, const char *metric,
 	graphite_msg[strlen(graphite_msg)+1] = 0;
         
         ret = push_data_to_carbon( graphite_msg );
-        ganglia_scoreboard_incby(INTER_EXPORTS_TIME_EXP_ALL, apr_time_now() - start);
-        ganglia_scoreboard_incby(INTER_EXPORTS_TIME_EXP_GRAPHITE, apr_time_now() - start);
+        ganglia_scoreboard_incby(METS_ALL_DURATION, apr_time_now() - start);
+        ganglia_scoreboard_incby(METS_GRAPHITE_DURATION, apr_time_now() - start);
         //printf("TIME TAKEN GRAPHITE: %lu\n", apr_time_now() - start);
    return ret;
 }
@@ -635,8 +635,8 @@ send_event_to_riemann (Event *event)
    }
    ganglia_scoreboard_inc(METS_SENT_RIEMANN);
    ganglia_scoreboard_inc(METS_SENT_ALL);
-   ganglia_scoreboard_incby(INTER_EXPORTS_TIME_EXP_ALL, apr_time_now() - start);
-   ganglia_scoreboard_incby(INTER_EXPORTS_TIME_EXP_RIEMANN, apr_time_now() - start);
+   ganglia_scoreboard_incby(METS_ALL_DURATION, apr_time_now() - start);
+   ganglia_scoreboard_incby(METS_RIEMANN_DURATION, apr_time_now() - start);
    //printf("TIME TAKEN RIEMANN: %lu\n", apr_time_now() - start);
    return EXIT_SUCCESS;
 }
@@ -689,8 +689,8 @@ send_message_to_riemann (Msg *message)
    }
    ganglia_scoreboard_incby(METS_SENT_RIEMANN, message->n_events);
    ganglia_scoreboard_incby(METS_SENT_ALL, message->n_events);
-   ganglia_scoreboard_incby(INTER_EXPORTS_TIME_EXP_ALL, apr_time_now() - start);
-   ganglia_scoreboard_incby(INTER_EXPORTS_TIME_EXP_RIEMANN, apr_time_now() - start);
+   ganglia_scoreboard_incby(METS_ALL_DURATION, apr_time_now() - start);
+   ganglia_scoreboard_incby(METS_RIEMANN_DURATION, apr_time_now() - start);
    //printf("TIME TAKEN RIEMANN: %lu\n", apr_time_now() - start);
    return EXIT_SUCCESS;
 }

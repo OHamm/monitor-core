@@ -22,7 +22,20 @@ typedef enum ganglia_scoreboard_types ganglia_scoreboard_types;
 #define METS_SENT_MEMCACHED "gmetad_metrics_sent_memcached"
 #define METS_SENT_RIEMANN "gmetad_metrics_sent_riemann"
 
-/* predefined gmetad scoreboard internal elements */
+#define METS_ALL_DURATION "mets_all_duration"
+#define METS_RRDTOOLS_DURATION "mets_rrdtools_duration"
+#define METS_RRDCACHED_DURATION "mets_rrdcached_duration"
+#define METS_GRAPHITE_DURATION "mets_graphite_duration"
+#define METS_MEMCACHED_DURATION "mets_memcached_duration"
+#define METS_RIEMANN_DURATION "mets_riemann_duration"
+
+#define METS_ALL_LAST_TIME "mets_all_last_time"
+#define METS_RRDTOOLS_LAST_TIME "mets_rrdtools_last_time"
+#define METS_RRDCACHED_LAST_TIME "mets_rrdcached_last_time"
+#define METS_GRAPHITE_LAST_TIME "mets_graphite_last_time"
+#define METS_MEMCACHED_LAST_TIME "mets_memcached_last_time"
+#define METS_RIEMANN_LAST_TIME "mets_riemann_last_time"
+
 #define ALL_POLL_REQS "all_poll_reqs"
 #define ALL_POLL_DURATION "all_poll_duration"
 #define ALL_POLL_LAST_TIME "all_poll_last_time"
@@ -39,28 +52,18 @@ typedef enum ganglia_scoreboard_types ganglia_scoreboard_types;
 #define RRD_POLL_DURATION "rrd_poll_duration"
 #define RRD_POLL_LAST_TIME "rrd_poll_last_time"
 
-/* Done by METS_SENT_...
-#define INTER_EXPORTS_NBR_ALL "gmetad_internal_exports_nbr_all"
-#define INTER_EXPORTS_NBR_RRDTOOLS "gmetad_internal_exports_nbr_rrdtools"
-#define INTER_EXPORTS_NBR_RRDCACHED "gmetad_internal_exports_nbr_rrdcached"
-#define INTER_EXPORTS_NBR_GRAPHITE "gmetad_internal_exports_nbr_graphite"
-#define INTER_EXPORTS_NBR_MEMCACHED "gmetad_internal_exports_nbr_memcached"
-#define INTER_EXPORTS_NBR_RIEMANN "gmetad_internal_exports_nbr_riemann"
-*/
-#define INTER_EXPORTS_TIME_EXP_ALL "gmetad_internal_exports_nbr_exp_time_all"
-#define INTER_EXPORTS_TIME_EXP_RRDTOOLS "gmetad_internal_exports_nbr_exp_time_rrdtools"
-#define INTER_EXPORTS_TIME_EXP_RRDCACHED "gmetad_internal_exports_nbr_exp_time_rrdcached"
-#define INTER_EXPORTS_TIME_EXP_GRAPHITE "gmetad_internal_exports_nbr_exp_time_graphite"
-#define INTER_EXPORTS_TIME_EXP_MEMCACHED "gmetad_internal_exports_nbr_exp_time_memcached"
-#define INTER_EXPORTS_TIME_EXP_RIEMANN "gmetad_internal_exports_nbr_exp_time_riemann"
+#define NBR_TCP_REQS_ALL "nbr_tcp_reqs_all"
+#define TIME_TCP_REQS_ALL "time_tcp_reqs_all"
+#define NBR_TCP_REQS_XML "nbr_tcp_reqs_xml"
+#define TIME_TCP_REQS_XML "time_tcp_reqs_xml"
+#define NBR_TCP_REQS_INTXML "nbr_tcp_reqs_intxml"
+#define TIME_TCP_REQS_INTXML "time_tcp_reqs_intxml"
 
-#define INTER_EXPORTS_LAST_EXP_ALL "gmetad_internal_exports_nbr_last_exp_all"
-#define INTER_EXPORTS_LAST_EXP_RRDTOOLS "gmetad_internal_exports_nbr_last_exp_rrdtools"
-#define INTER_EXPORTS_LAST_EXP_RRDCACHED "gmetad_internal_exports_nbr_last_exp_rrdcached"
-#define INTER_EXPORTS_LAST_EXP_GRAPHITE "gmetad_internal_exports_nbr_last_exp_graphite"
-#define INTER_EXPORTS_LAST_EXP_MEMCACHED "gmetad_internal_exports_nbr_last_exp_memcached"
-#define INTER_EXPORTS_LAST_EXP_RIEMANN "gmetad_internal_exports_nbr_last_exp_riemann"
+#define METS_SUMRZ_NUM "mets_sumrz_num"
+#define METS_SUMRZ_DURATION "mets_sumrz_duration"
+#define METS_SUMRZ_LAST_TIME "mets_sumrz_last_time"
 
+/*
 #define INTER_IMPORTS_NBR_ALL "gmetad_internal_imports_nbr_all"
 #define INTER_IMPORTS_NBR_RRDTOOLS "gmetad_internal_imports_nbr_rrdtools"
 #define INTER_IMPORTS_NBR_RRDCACHED "gmetad_internal_imports_nbr_rrdcached"
@@ -82,18 +85,6 @@ typedef enum ganglia_scoreboard_types ganglia_scoreboard_types;
 #define INTER_IMPORTS_LAST_EXP_MEMCACHED "gmetad_internal_imports_nbr_last_exp_memcached"
 #define INTER_IMPORTS_LAST_EXP_RIEMANN "gmetad_internal_imports_nbr_last_exp_riemann"
 
-#define NBR_TCP_REQS_ALL "nbr_tcp_reqs_all"
-#define TIME_TCP_REQS_ALL "time_tcp_reqs_all"
-#define NBR_TCP_REQS_XML "nbr_tcp_reqs_xml"
-#define TIME_TCP_REQS_XML "time_tcp_reqs_xml"
-#define NBR_TCP_REQS_INTXML "nbr_tcp_reqs_intxml"
-#define TIME_TCP_REQS_INTXML "time_tcp_reqs_intxml"
-
-#define METS_SUMRZ_ALL "mets_sumrz_all"
-#define METS_SUMRZ_DURATION "mets_sumrz_duration"
-#define METS_SUMRZ_LAST_TIME "mets_sumrz_last_time"
-
-/*
 #define INTER_LATENCY_TIME_ALL "gmetad_internal_latency_time_all"
 #define INTER_LATENCY__ALL "gmetad_internal_latency__all"
 */

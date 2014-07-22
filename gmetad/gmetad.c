@@ -275,20 +275,13 @@ void initialize_scoreboard()
     ganglia_scoreboard_add(DATA_POLL_LAST_TIME, GSB_COUNTER);
     ganglia_scoreboard_add(CARBON_POLL_REQS, GSB_COUNTER);
     ganglia_scoreboard_add(CARBON_POLL_DURATION, GSB_COUNTER);
-    //ganglia_scoreboard_add(CARBON_POLL_LAST_TIME, GSB_COUNTER);
+    //TODO
+    ganglia_scoreboard_add(CARBON_POLL_LAST_TIME, GSB_COUNTER);
     ganglia_scoreboard_add(RRD_POLL_REQS, GSB_COUNTER);
     ganglia_scoreboard_add(RRD_POLL_DURATION, GSB_COUNTER);
-    //ganglia_scoreboard_add(RRD_POLL_LAST_TIME, GSB_COUNTER);
-    
-    /* This is done with the METS_SENT_...
-     ganglia_scoreboard_add(INTER_EXPORTS_NBR_ALL, GSB_COUNTER);
-     ganglia_scoreboard_add(INTER_EXPORTS_NBR_RRDTOOLS, GSB_COUNTER);
-     ganglia_scoreboard_add(INTER_EXPORTS_NBR_RRDCACHED, GSB_COUNTER);
-     ganglia_scoreboard_add(INTER_EXPORTS_NBR_GRAPHITE, GSB_COUNTER);
-     ganglia_scoreboard_add(INTER_EXPORTS_NBR_MEMCACHED, GSB_COUNTER);
-     ganglia_scoreboard_add(INTER_EXPORTS_NBR_RIEMANN, GSB_COUNTER);
-     */
-    //Will rename when done.
+    //TODO
+    ganglia_scoreboard_add(RRD_POLL_LAST_TIME, GSB_COUNTER);
+
     ganglia_scoreboard_add(METS_RECVD_ALL, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SENT_ALL, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SENT_RRDTOOL, GSB_COUNTER);
@@ -296,28 +289,27 @@ void initialize_scoreboard()
     ganglia_scoreboard_add(METS_SENT_GRAPHITE, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SENT_MEMCACHED, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SENT_RIEMANN, GSB_COUNTER);
-    
-    ganglia_scoreboard_add(INTER_EXPORTS_TIME_EXP_ALL, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_EXPORTS_TIME_EXP_RRDTOOLS, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_EXPORTS_TIME_EXP_RRDCACHED, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_EXPORTS_TIME_EXP_GRAPHITE, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_EXPORTS_TIME_EXP_MEMCACHED, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_EXPORTS_TIME_EXP_RIEMANN, GSB_COUNTER);
-    
-    ganglia_scoreboard_add(INTER_EXPORTS_LAST_EXP_ALL, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_EXPORTS_LAST_EXP_RRDTOOLS, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_EXPORTS_LAST_EXP_RRDCACHED, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_EXPORTS_LAST_EXP_GRAPHITE, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_EXPORTS_LAST_EXP_MEMCACHED, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_EXPORTS_LAST_EXP_RIEMANN, GSB_COUNTER);
 
-    ganglia_scoreboard_add(METS_SUMRZ_ALL, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_ALL_DURATION, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_RRDTOOLS_DURATION, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_RRDCACHED_DURATION, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_GRAPHITE_DURATION, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_MEMCACHED_DURATION, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_RIEMANN_DURATION, GSB_COUNTER);
+    
+    ganglia_scoreboard_add(METS_ALL_LAST_TIME, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_RRDTOOLS_LAST_TIME, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_RRDCACHED_LAST_TIME, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_GRAPHITE_LAST_TIME, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_MEMCACHED_LAST_TIME, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_RIEMANN_LAST_TIME, GSB_COUNTER);
+
+    ganglia_scoreboard_add(METS_SUMRZ_NUM, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SUMRZ_DURATION, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SUMRZ_LAST_TIME, GSB_COUNTER);
     
     ganglia_scoreboard_add(NBR_TCP_REQS_ALL, GSB_COUNTER);
     ganglia_scoreboard_add(TIME_TCP_REQS_ALL, GSB_COUNTER);
-
     ganglia_scoreboard_add(NBR_TCP_REQS_XML, GSB_COUNTER);
     ganglia_scoreboard_add(TIME_TCP_REQS_XML, GSB_COUNTER);
     ganglia_scoreboard_add(NBR_TCP_REQS_INTXML, GSB_COUNTER);
@@ -641,7 +633,7 @@ main ( int argc, char *argv[] )
    last_metadata = apr_time_now();
    for(;;)
    {
-         ganglia_scoreboard_inc(METS_SUMRZ_ALL);
+         ganglia_scoreboard_inc(METS_SUMRZ_NUM);
          /* Do at a random interval, between 
                  (shortest_step/2) +/- METADATA_SLEEP_RANDOMIZE percent */
          random_sleep_factor = (1 + (METADATA_SLEEP_RANDOMIZE / 50.0) * ((rand_r(&rand_seed) - RAND_MAX/2)/(float)RAND_MAX));

@@ -195,8 +195,8 @@ reconnect:
             }
       }
       
-    ganglia_scoreboard_incby(INTER_EXPORTS_TIME_EXP_ALL, apr_time_now() - start);
-    ganglia_scoreboard_incby(INTER_EXPORTS_TIME_EXP_RRDCACHED, apr_time_now() - start);
+    ganglia_scoreboard_incby(METS_ALL_DURATION, apr_time_now() - start);
+    ganglia_scoreboard_incby(METS_RRDCACHED_DURATION, apr_time_now() - start);
    return 0;
 }
 
@@ -399,7 +399,7 @@ write_data_to_rrd ( const char *source, const char *host, const char *metric,
    strncat(rrd, ".rrd", PATHSIZE-strlen(rrd));
 
    ret = push_data_to_rrd( rrd, sum, num, step, process_time, slope);
-   ganglia_scoreboard_incby(INTER_EXPORTS_TIME_EXP_ALL, apr_time_now() - start);
-   ganglia_scoreboard_incby(INTER_EXPORTS_TIME_EXP_RRDTOOLS, apr_time_now() - start);
+   ganglia_scoreboard_incby(METS_ALL_DURATION, apr_time_now() - start);
+   ganglia_scoreboard_incby(METS_RRDTOOLS_DURATION, apr_time_now() - start);
    return ret;
 }
