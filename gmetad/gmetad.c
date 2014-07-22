@@ -67,6 +67,9 @@ apr_pool_t *global_context = NULL;
 /* When this gmetad was started */
 apr_time_t started;
 
+/* Last gmetad run */
+apr_time_t last_metadata;
+
 char hostname[HOSTNAMESZ];
 
 static int
@@ -412,7 +415,7 @@ main ( int argc, char *argv[] )
    struct passwd *pw;
    gmetad_config_t *c = &gmetad_config;
    apr_interval_time_t sleep_time;
-   apr_time_t last_metadata, summary_started;
+   apr_time_t summary_started;
    double random_sleep_factor;
    unsigned int rand_seed;
 
