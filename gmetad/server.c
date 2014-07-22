@@ -713,7 +713,7 @@ status_report( client_t *client , char *callback)
        ganglia_scoreboard_get("gmetad_metrics_sent_memcached"),
        ganglia_scoreboard_get("gmetad_metrics_sent_riemann"),
        ganglia_scoreboard_get(METS_SUMRZ_ALL),
-       ganglia_scoreboard_get(METS_SUMRZ_DURATION)//,
+       ganglia_scoreboard_get(METS_SUMRZ_DURATION),
        (long int)(last_metadata / APR_TIME_C(1000)) // ms
    );
 
