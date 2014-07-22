@@ -264,18 +264,18 @@ void initialize_scoreboard()
 {
     ganglia_scoreboard_init(global_context);
     
-    ganglia_scoreboard_add(INTER_POLLS_NBR_ALL, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_POLLS_DUR_ALL, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_POLLS_TIM_ALL, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_POLLS_NBR_DATA, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_POLLS_DUR_DATA, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_POLLS_TIM_DATA, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_POLLS_NBR_CARBON, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_POLLS_DUR_CARBON, GSB_COUNTER);
-    //ganglia_scoreboard_add(INTER_POLLS_TIM_CARBON, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_POLLS_NBR_RRD, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_POLLS_DUR_RRD, GSB_COUNTER);
-    //ganglia_scoreboard_add(INTER_POLLS_TIM_RRD, GSB_COUNTER);
+    ganglia_scoreboard_add(ALL_POLL_REQS, GSB_COUNTER);
+    ganglia_scoreboard_add(ALL_POLL_DURATION, GSB_COUNTER);
+    ganglia_scoreboard_add(ALL_POLL_LAST_TIME, GSB_COUNTER);
+    ganglia_scoreboard_add(DATA_POLL_REQS, GSB_COUNTER);
+    ganglia_scoreboard_add(DATA_POLL_DURATION, GSB_COUNTER);
+    ganglia_scoreboard_add(DATA_POLL_LAST_TIME, GSB_COUNTER);
+    ganglia_scoreboard_add(CARBON_POLL_REQS, GSB_COUNTER);
+    ganglia_scoreboard_add(CARBON_POLL_DURATION, GSB_COUNTER);
+    //ganglia_scoreboard_add(CARBON_POLL_LAST_TIME, GSB_COUNTER);
+    ganglia_scoreboard_add(RRD_POLL_REQS, GSB_COUNTER);
+    ganglia_scoreboard_add(RRD_POLL_DURATION, GSB_COUNTER);
+    //ganglia_scoreboard_add(RRD_POLL_LAST_TIME, GSB_COUNTER);
     
     /* This is done with the METS_SENT_...
      ganglia_scoreboard_add(INTER_EXPORTS_NBR_ALL, GSB_COUNTER);
