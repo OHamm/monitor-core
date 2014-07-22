@@ -412,7 +412,7 @@ main ( int argc, char *argv[] )
    struct passwd *pw;
    gmetad_config_t *c = &gmetad_config;
    apr_interval_time_t sleep_time;
-   apr_time_t last_metadata, before_sum, after_sum;
+   apr_time_t last_metadata, summary_started;
    double random_sleep_factor;
    unsigned int rand_seed;
 
@@ -651,8 +651,7 @@ main ( int argc, char *argv[] )
          /* Need to be sure root is locked while doing summary */
          pthread_mutex_lock(root.sum_finished);
 
-         //NOTE: Not sure if the sleep should be added in the timing.
-         before_sum = apr_time_now();
+         summary_started = apr_time_now();
          /* Flush the old values */
          hash_foreach(root.metric_summary, zero_out_summary, NULL);
          root.hosts_up = 0;
@@ -668,10 +667,8 @@ main ( int argc, char *argv[] )
          hash_foreach(root.metric_summary, write_root_summary, NULL);
          
          /* Remember our last run */
-         after_sum = apr_time_now();
-         ganglia_scoreboard_incby(METS_SUMRZ_DURATION, after_sum - before_sum);
-         ganglia_scoreboard_set(METS_SUMRZ_LAST_TIME, after_sum - last_metadata);
-         last_metadata = after_sum;
+         ganglia_scoreboard_incby(METS_SUMRZ_DURATION, apr_time_now() - summary_started);
+         last_metadata = apr_time_now();
       }
 
    apr_pool_destroy(global_context);
