@@ -22,6 +22,8 @@
 /* Local metrics */
 #include "libmetrics.h"
 
+extern apr_time_t last_metadata;
+
 static const struct metricinfo
 {
   const char *name;
@@ -692,7 +694,7 @@ status_report( client_t *client , char *callback)
        "\"summarize\":{"
        "\"num\":%u,"
        "\"totalMillis\":%u,"
-       "\"lastTime\":%u"
+       "\"lastTime\":%lu"
        "},",
        callback != NULL ? callback : "",
        callback != NULL ? "(" : "",
@@ -711,8 +713,8 @@ status_report( client_t *client , char *callback)
        ganglia_scoreboard_get("gmetad_metrics_sent_memcached"),
        ganglia_scoreboard_get("gmetad_metrics_sent_riemann"),
        ganglia_scoreboard_get(METS_SUMRZ_ALL),
-       ganglia_scoreboard_get(METS_SUMRZ_DURATION),
-       ganglia_scoreboard_get(METS_SUMRZ_LAST_TIME)
+       ganglia_scoreboard_get(METS_SUMRZ_DURATION)//,
+       (long int)(last_metadata / APR_TIME_C(1000)) // ms
    );
 
    /* Get local metrics */
