@@ -315,8 +315,8 @@ void initialize_scoreboard()
     ganglia_scoreboard_add(METS_SUMRZ_DURATION, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SUMRZ_LAST_TIME, GSB_COUNTER);
     
-    ganglia_scoreboard_add(INTER_REQUESTS_NBR_ALL, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_REQUESTS_TIME_ALL, GSB_COUNTER);
+    ganglia_scoreboard_add(NBR_TCP_REQS_ALL, GSB_COUNTER);
+    ganglia_scoreboard_add(TIME_TCP_REQS_ALL, GSB_COUNTER);
 
     ganglia_scoreboard_add(NBR_TCP_REQS_XML, GSB_COUNTER);
     ganglia_scoreboard_add(TIME_TCP_REQS_XML, GSB_COUNTER);

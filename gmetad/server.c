@@ -694,6 +694,20 @@ status_report( client_t *client , char *callback)
        "\"num\":%u,"
        "\"totalMillis\":%u,"
        "\"lastTime\":%lu"
+       "},"
+       "\"requests\":{"
+       "\"requests_all\":{"
+       "\"num\":%u,"
+       "\"lastTime\":%u"
+       "},"
+       "\"requests_interactive\":{"
+       "\"num\":%u,"
+       "\"lastTime\":%u"
+       "},"
+       "\"requests_xml\":{"
+       "\"num\":%u,"
+       "\"lastTime\":%u"
+       "}"
        "},",
        callback != NULL ? callback : "",
        callback != NULL ? "(" : "",
@@ -713,7 +727,13 @@ status_report( client_t *client , char *callback)
        ganglia_scoreboard_get("gmetad_metrics_sent_riemann"),
        ganglia_scoreboard_get(METS_SUMRZ_ALL),
        ganglia_scoreboard_get(METS_SUMRZ_DURATION),
-       (long int)(last_metadata / APR_TIME_C(1000)) // ms
+       (long int)(last_metadata / APR_TIME_C(1000)), // ms
+       ganglia_scoreboard_get(NBR_TCP_REQS_ALL),
+       ganglia_scoreboard_get(TIME_TCP_REQS_ALL),
+       ganglia_scoreboard_get(NBR_TCP_REQS_INTXML),
+       ganglia_scoreboard_get(TIME_TCP_REQS_INTXML),
+       ganglia_scoreboard_get(NBR_TCP_REQS_XML),
+       ganglia_scoreboard_get(TIME_TCP_REQS_XML)
    );
 
    /* Get local metrics */
@@ -1085,7 +1105,7 @@ server_thread (void *arg)
                pthread_mutex_lock(&server_interactive_mutex);
                SYS_CALL( client.fd, accept(interactive_socket->sockfd, (struct sockaddr *) &(client.addr), &len));
                pthread_mutex_unlock(&server_interactive_mutex);
-               ganglia_scoreboard_inc(INTER_REQUESTS_NBR_ALL);
+               ganglia_scoreboard_inc(NBR_TCP_REQS_ALL);
                ganglia_scoreboard_inc(NBR_TCP_REQS_INTXML);
                now = apr_time_now();
             }
@@ -1094,7 +1114,7 @@ server_thread (void *arg)
                pthread_mutex_lock  ( &server_socket_mutex );
                SYS_CALL( client.fd, accept(server_socket->sockfd, (struct sockaddr *) &(client.addr), &len));
                pthread_mutex_unlock( &server_socket_mutex );
-               ganglia_scoreboard_inc(INTER_REQUESTS_NBR_ALL);
+               ganglia_scoreboard_inc(NBR_TCP_REQS_ALL);
                ganglia_scoreboard_inc(NBR_TCP_REQS_XML);
                now = apr_time_now();
             }
@@ -1139,7 +1159,7 @@ server_thread (void *arg)
                debug_msg("server_thread() received request \"%s\" from %s", request, remote_ip);
                rc = process_request(&client, request);
                afternow = apr_time_now();
-               ganglia_scoreboard_set(INTER_REQUESTS_TIME_ALL, afternow - now);//Port 8652
+               ganglia_scoreboard_set(TIME_TCP_REQS_ALL, afternow - now);//Port 8652
                ganglia_scoreboard_set(TIME_TCP_REQS_INTXML, afternow - now);
                if (rc == 1)
                   {
@@ -1155,7 +1175,7 @@ server_thread (void *arg)
                   }
             }
          else{
-             ganglia_scoreboard_inc(INTER_REQUESTS_NBR_ALL);
+             ganglia_scoreboard_inc(NBR_TCP_REQS_ALL);
              strcpy(request, "/");
          }
 
@@ -1180,7 +1200,7 @@ server_thread (void *arg)
             }
             else{
                 afternow = apr_time_now();
-                ganglia_scoreboard_set(INTER_REQUESTS_TIME_ALL, afternow - now);//Port 8651
+                ganglia_scoreboard_set(TIME_TCP_REQS_ALL, afternow - now);//Port 8651
                 ganglia_scoreboard_set(TIME_TCP_REQS_XML, afternow - now);
          }
 
