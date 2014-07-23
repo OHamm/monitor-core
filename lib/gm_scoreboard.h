@@ -36,21 +36,8 @@ typedef enum ganglia_scoreboard_types ganglia_scoreboard_types;
 #define METS_MEMCACHED_LAST_TIME "mets_memcached_last_time"
 #define METS_RIEMANN_LAST_TIME "mets_riemann_last_time"
 
-#define ALL_POLL_REQS "all_poll_reqs"
-#define ALL_POLL_DURATION "all_poll_duration"
-#define ALL_POLL_LAST_TIME "all_poll_last_time"
-
-#define DATA_POLL_REQS "data_poll_reqs"
-#define DATA_POLL_DURATION "data_poll_duration"
-#define DATA_POLL_LAST_TIME "data_poll_last_time"
-
-#define CARBON_POLL_REQS "carbon_poll_reqs"
-#define CARBON_POLL_DURATION "carbon_poll_duration"
-#define CARBON_POLL_LAST_TIME "carbon_poll_last_time"
-
-#define RRD_POLL_REQS "rrd_poll_reqs"
-#define RRD_POLL_DURATION "rrd_poll_duration"
-#define RRD_POLL_LAST_TIME "rrd_poll_last_time"
+#define DS_POLL_REQS "ds_poll_reqs"
+#define DS_POLL_DURATION "ds_poll_duration"
 
 #define NBR_TCP_REQS_ALL "nbr_tcp_reqs_all"
 #define TIME_TCP_REQS_ALL "time_tcp_reqs_all"

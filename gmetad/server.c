@@ -158,7 +158,7 @@ extern gmetad_config_t gmetad_config;
 extern char* getfield(char *buf, short int index);
 extern struct type_tag* in_type_list (char *, unsigned int);
 
-extern apr_time_t started;
+extern apr_time_t started, last_poll;
 extern apr_time_t last_metadata;
 
 extern char hostname[HOSTNAMESZ];
@@ -734,26 +734,9 @@ status_report( client_t *client , char *callback)
        "}"
        "},"
        "\"polls\":{"
-       "\"all\":{"
        "\"num\":%u,"
        "\"totalMillis\":%u,"
-       "\"lastTime\":%u"
-       "},"
-       "\"data\":{"
-       "\"num\":%u,"
-       "\"totalMillis\":%u,"
-       "\"lastTime\":%u"
-       "},"
-       "\"carbon\":{"
-       "\"num\":%u,"
-       "\"totalMillis\":%u,"
-       "\"lastTime\":%u"
-       "},"
-       "\"rrd\":{"
-       "\"num\":%u,"
-       "\"totalMillis\":%u,"
-       "\"lastTime\":%u"
-       "}"
+       "\"lastTime\":%lu"
        "},"
        ,
        callback != NULL ? callback : "",
@@ -794,18 +777,9 @@ status_report( client_t *client , char *callback)
        ganglia_scoreboard_get(TIME_TCP_REQS_INTXML),
        ganglia_scoreboard_get(NBR_TCP_REQS_XML),
        ganglia_scoreboard_get(TIME_TCP_REQS_XML),
-       ganglia_scoreboard_get(ALL_POLL_REQS),
-       ganglia_scoreboard_get(ALL_POLL_DURATION),
-       ganglia_scoreboard_get(ALL_POLL_LAST_TIME),
-       ganglia_scoreboard_get(DATA_POLL_REQS),
-       ganglia_scoreboard_get(DATA_POLL_DURATION),
-       ganglia_scoreboard_get(DATA_POLL_LAST_TIME),
-       ganglia_scoreboard_get(CARBON_POLL_REQS),
-       ganglia_scoreboard_get(CARBON_POLL_DURATION),
-       ganglia_scoreboard_get(CARBON_POLL_LAST_TIME),
-       ganglia_scoreboard_get(RRD_POLL_REQS),
-       ganglia_scoreboard_get(RRD_POLL_DURATION),
-       ganglia_scoreboard_get(RRD_POLL_LAST_TIME)
+       ganglia_scoreboard_get(DS_POLL_REQS),
+       ganglia_scoreboard_get(DS_POLL_DURATION),
+       (long int)(last_poll / APR_TIME_C(1000)) // ms
    );
 
    /* Get local metrics */

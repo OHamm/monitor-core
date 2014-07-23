@@ -188,7 +188,6 @@ push_data_to_carbon( char *graphite_msg)
 
   if (!strcmp(gmetad_config.carbon_protocol, "tcp"))
     {
-      apr_time_t now;
       int port;
       int carbon_socket;
       struct sockaddr_in server;
@@ -231,13 +230,7 @@ push_data_to_carbon( char *graphite_msg)
        carbon_struct_poll.fd=carbon_socket;
        carbon_struct_poll.events = POLLOUT;
 
-       ganglia_scoreboard_inc(ALL_POLL_REQS);
-       ganglia_scoreboard_inc(CARBON_POLL_REQS);
-       now = apr_time_now();
        poll_rval = poll( &carbon_struct_poll, 1, carbon_timeout ); // default timeout .5s
-       apr_time_t afternow = apr_time_now();
-       ganglia_scoreboard_incby(ALL_POLL_DURATION, afternow - now);
-       ganglia_scoreboard_incby(CARBON_POLL_DURATION, afternow - now);
        /* Send data to the server when the socket becomes ready */
       if( poll_rval < 0 ) {
         debug_msg("carbon proxy:: poll() error");

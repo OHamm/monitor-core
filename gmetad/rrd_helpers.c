@@ -122,13 +122,7 @@ reconnect:
 
    while (1)
       {
-         ganglia_scoreboard_inc(ALL_POLL_REQS);
-         ganglia_scoreboard_inc(RRD_POLL_REQS);
-         apr_time_t now = apr_time_now();
          int r = poll(pfd, 1, 250);
-         apr_time_t afternow = apr_time_now();
-         ganglia_scoreboard_incby(ALL_POLL_DURATION, afternow - now);
-         ganglia_scoreboard_incby(RRD_POLL_DURATION, afternow - now);
          
          if (r == 0)
             {

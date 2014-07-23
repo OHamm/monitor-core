@@ -267,20 +267,8 @@ void initialize_scoreboard()
 {
     ganglia_scoreboard_init(global_context);
     
-    ganglia_scoreboard_add(ALL_POLL_REQS, GSB_COUNTER);
-    ganglia_scoreboard_add(ALL_POLL_DURATION, GSB_COUNTER);
-    ganglia_scoreboard_add(ALL_POLL_LAST_TIME, GSB_COUNTER);
-    ganglia_scoreboard_add(DATA_POLL_REQS, GSB_COUNTER);
-    ganglia_scoreboard_add(DATA_POLL_DURATION, GSB_COUNTER);
-    ganglia_scoreboard_add(DATA_POLL_LAST_TIME, GSB_COUNTER);
-    ganglia_scoreboard_add(CARBON_POLL_REQS, GSB_COUNTER);
-    ganglia_scoreboard_add(CARBON_POLL_DURATION, GSB_COUNTER);
-    //TODO
-    ganglia_scoreboard_add(CARBON_POLL_LAST_TIME, GSB_COUNTER);
-    ganglia_scoreboard_add(RRD_POLL_REQS, GSB_COUNTER);
-    ganglia_scoreboard_add(RRD_POLL_DURATION, GSB_COUNTER);
-    //TODO
-    ganglia_scoreboard_add(RRD_POLL_LAST_TIME, GSB_COUNTER);
+    ganglia_scoreboard_add(DS_POLL_REQS, GSB_COUNTER);
+    ganglia_scoreboard_add(DS_POLL_DURATION, GSB_COUNTER);
 
     ganglia_scoreboard_add(METS_RECVD_ALL, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SENT_ALL, GSB_COUNTER);
