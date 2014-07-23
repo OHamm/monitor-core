@@ -679,7 +679,7 @@ status_report( client_t *client , char *callback)
        "\"uptimeMillis\":%lu,"
        "\"metrics\":{"
        "\"received\":{"
-       "\"received_all\":%u"
+       "\"all\":%u"
        "},"
        "\"sent\":{"
        "\"all\":{"
