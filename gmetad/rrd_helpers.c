@@ -25,6 +25,8 @@ extern gmetad_config_t gmetad_config;
 
 pthread_mutex_t rrd_mutex = PTHREAD_MUTEX_INITIALIZER;
 
+apr_time_t last_rrdtool, last_rrdcached;
+
 #ifdef HAVE___THREAD
 static __thread int rrdcached_conn = 0;
 #else
@@ -337,15 +339,17 @@ push_data_to_rrd( char *rrd, const char *sum, const char *num,
             return rval;
       }
    if (gmetad_config.rrdcached_addrstr != NULL)
-      {
+   {
          ganglia_scoreboard_inc(METS_SENT_RRDCACHED);
          ganglia_scoreboard_inc(METS_SENT_ALL);
+         last_rrdcached = apr_time_now();
          return RRD_update_cached( rrd, sum, num, process_time );
       }
    else
       {
          ganglia_scoreboard_inc(METS_SENT_RRDTOOL);
          ganglia_scoreboard_inc(METS_SENT_ALL);
+         last_rrdtool = apr_time_now();
          return RRD_update( rrd, sum, num, process_time );
       }
 }

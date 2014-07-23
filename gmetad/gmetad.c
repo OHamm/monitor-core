@@ -284,17 +284,9 @@ void initialize_scoreboard()
     ganglia_scoreboard_add(METS_GRAPHITE_DURATION, GSB_COUNTER);
     ganglia_scoreboard_add(METS_MEMCACHED_DURATION, GSB_COUNTER);
     ganglia_scoreboard_add(METS_RIEMANN_DURATION, GSB_COUNTER);
-    
-    ganglia_scoreboard_add(METS_ALL_LAST_TIME, GSB_COUNTER);
-    ganglia_scoreboard_add(METS_RRDTOOLS_LAST_TIME, GSB_COUNTER);
-    ganglia_scoreboard_add(METS_RRDCACHED_LAST_TIME, GSB_COUNTER);
-    ganglia_scoreboard_add(METS_GRAPHITE_LAST_TIME, GSB_COUNTER);
-    ganglia_scoreboard_add(METS_MEMCACHED_LAST_TIME, GSB_COUNTER);
-    ganglia_scoreboard_add(METS_RIEMANN_LAST_TIME, GSB_COUNTER);
 
     ganglia_scoreboard_add(METS_SUMRZ_NUM, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SUMRZ_DURATION, GSB_COUNTER);
-    ganglia_scoreboard_add(METS_SUMRZ_LAST_TIME, GSB_COUNTER);
     
     ganglia_scoreboard_add(NBR_TCP_REQS_ALL, GSB_COUNTER);
     ganglia_scoreboard_add(TIME_TCP_REQS_ALL, GSB_COUNTER);

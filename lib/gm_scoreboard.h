@@ -29,13 +29,6 @@ typedef enum ganglia_scoreboard_types ganglia_scoreboard_types;
 #define METS_MEMCACHED_DURATION "mets_memcached_duration"
 #define METS_RIEMANN_DURATION "mets_riemann_duration"
 
-#define METS_ALL_LAST_TIME "mets_all_last_time"
-#define METS_RRDTOOLS_LAST_TIME "mets_rrdtools_last_time"
-#define METS_RRDCACHED_LAST_TIME "mets_rrdcached_last_time"
-#define METS_GRAPHITE_LAST_TIME "mets_graphite_last_time"
-#define METS_MEMCACHED_LAST_TIME "mets_memcached_last_time"
-#define METS_RIEMANN_LAST_TIME "mets_riemann_last_time"
-
 #define DS_POLL_REQS "ds_poll_reqs"
 #define DS_POLL_DURATION "ds_poll_duration"
 
@@ -48,7 +41,6 @@ typedef enum ganglia_scoreboard_types ganglia_scoreboard_types;
 
 #define METS_SUMRZ_NUM "mets_sumrz_num"
 #define METS_SUMRZ_DURATION "mets_sumrz_duration"
-#define METS_SUMRZ_LAST_TIME "mets_sumrz_last_time"
 
 /*
 #define INTER_IMPORTS_NBR_ALL "gmetad_internal_imports_nbr_all"

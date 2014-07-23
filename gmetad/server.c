@@ -158,8 +158,7 @@ extern gmetad_config_t gmetad_config;
 extern char* getfield(char *buf, short int index);
 extern struct type_tag* in_type_list (char *, unsigned int);
 
-extern apr_time_t started, last_poll;
-extern apr_time_t last_metadata;
+extern apr_time_t started, last_poll, last_rrdtool, last_rrdcached, last_memcached, last_graphite, last_riemann, last_metadata;
 
 extern char hostname[HOSTNAMESZ];
 
@@ -685,33 +684,32 @@ status_report( client_t *client , char *callback)
        "\"sent\":{"
        "\"all\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u,"
-       "\"lastTime\":%u"
+       "\"totalMillis\":%u"
        "},"
        "\"rrdtool\":{"
        "\"num\":%u,"
        "\"totalMillis\":%u,"
-       "\"lastTime\":%u"
+       "\"lastTime\":%lu"
        "},"
        "\"rrdcached\":{"
        "\"num\":%u,"
        "\"totalMillis\":%u,"
-       "\"lastTime\":%u"
+       "\"lastTime\":%lu"
        "},"
        "\"graphite\":{"
        "\"num\":%u,"
        "\"totalMillis\":%u,"
-       "\"lastTime\":%u"
+       "\"lastTime\":%lu"
        "},"
        "\"memcached\":{"
        "\"num\":%u,"
        "\"totalMillis\":%u,"
-       "\"lastTime\":%u"
+       "\"lastTime\":%lu"
        "},"
        "\"riemann\":{"
        "\"num\":%u,"
        "\"totalMillis\":%u,"
-       "\"lastTime\":%u"
+       "\"lastTime\":%lu"
        "}"
        "},"
        "\"summarize\":{"
@@ -749,25 +747,23 @@ status_report( client_t *client , char *callback)
        (long int)((now - started) / APR_USEC_PER_SEC), // seconds
        (long int)((now - started) / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(METS_RECVD_ALL),
-       
        ganglia_scoreboard_get(METS_SENT_ALL),
        ganglia_scoreboard_get(METS_ALL_DURATION),
-       ganglia_scoreboard_get(METS_ALL_LAST_TIME),
        ganglia_scoreboard_get(METS_SENT_RRDTOOL),
        ganglia_scoreboard_get(METS_RRDTOOLS_DURATION),
-       ganglia_scoreboard_get(METS_RRDTOOLS_LAST_TIME),
+       (long int)(last_rrdtool / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(METS_SENT_RRDCACHED),
        ganglia_scoreboard_get(METS_RRDCACHED_DURATION),
-       ganglia_scoreboard_get(METS_RRDCACHED_LAST_TIME),
+       (long int)(last_rrdcached / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(METS_SENT_GRAPHITE),
        ganglia_scoreboard_get(METS_GRAPHITE_DURATION),
-       ganglia_scoreboard_get(METS_GRAPHITE_LAST_TIME),
+       (long int)(last_graphite / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(METS_SENT_MEMCACHED),
        ganglia_scoreboard_get(METS_MEMCACHED_DURATION),
-       ganglia_scoreboard_get(METS_MEMCACHED_LAST_TIME),
+       (long int)(last_memcached / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(METS_SENT_RIEMANN),
        ganglia_scoreboard_get(METS_RIEMANN_DURATION),
-       ganglia_scoreboard_get(METS_RIEMANN_LAST_TIME),
+       (long int)(last_riemann / APR_TIME_C(1000)), // ms THIS ONE
        ganglia_scoreboard_get(METS_SUMRZ_NUM),
        ganglia_scoreboard_get(METS_SUMRZ_DURATION),
        (long int)(last_metadata / APR_TIME_C(1000)), // ms
