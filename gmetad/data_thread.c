@@ -20,6 +20,8 @@ extern hash_t *root;
 
 extern int process_xml(data_source_list_t *, char *);
 
+apr_time_t last_poll;
+
 void *
 data_thread ( void *arg )
 {
@@ -32,11 +34,10 @@ data_thread ( void *arg )
    /* This will grow as needed */
    unsigned int buf_size = 1024*128, read_index, read_available;
    struct pollfd struct_poll;
-   apr_time_t start, end;
+   apr_time_t start, end, after_poll, now;
    apr_interval_time_t sleep_time, elapsed;
    double random_factor;
    unsigned int rand_seed;
-   unsigned long last_poll = 0;
 
    rand_seed = apr_time_now() * (int)pthread_self();
    for(i = 0; d->name[i] != 0; rand_seed = rand_seed * d->name[i++]);
@@ -104,17 +105,14 @@ data_thread ( void *arg )
          read_index = 0;
          for(;;)
             {
-               ganglia_scoreboard_inc(INTER_POLLS_NBR_ALL);
-               ganglia_scoreboard_inc(INTER_POLLS_NBR_DATA);
-               apr_time_t now = apr_time_now();
+               ganglia_scoreboard_inc(DS_POLL_REQS);
+               now = apr_time_now();
                /* Timeout set to 10 seconds */
                rval = poll( &struct_poll, 1, 10000);
-               apr_time_t afternow = apr_time_now();
-               ganglia_scoreboard_incby(INTER_POLLS_DUR_ALL, afternow - now);
-               ganglia_scoreboard_incby(INTER_POLLS_DUR_DATA, afternow - now);
-               ganglia_scoreboard_set(INTER_POLLS_TIM_ALL, (last_poll != 0 ? now - last_poll : 0));
-               ganglia_scoreboard_set(INTER_POLLS_TIM_DATA, (last_poll != 0 ? now - last_poll : 0));
-               last_poll = now;
+               after_poll = apr_time_now();
+               ganglia_scoreboard_incby(DS_POLL_DURATION, after_poll - now);
+               last_poll = after_poll;
+               
                if( rval < 0 )
                   {
                      /* Error */

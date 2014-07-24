@@ -25,6 +25,8 @@ extern gmetad_config_t gmetad_config;
 
 pthread_mutex_t rrd_mutex = PTHREAD_MUTEX_INITIALIZER;
 
+apr_time_t last_rrdtool, last_rrdcached;
+
 #ifdef HAVE___THREAD
 static __thread int rrdcached_conn = 0;
 #else
@@ -122,13 +124,7 @@ reconnect:
 
    while (1)
       {
-         ganglia_scoreboard_inc(INTER_POLLS_NBR_ALL);
-         ganglia_scoreboard_inc(INTER_POLLS_NBR_RRD);
-         apr_time_t now = apr_time_now();
          int r = poll(pfd, 1, 250);
-         apr_time_t afternow = apr_time_now();
-         ganglia_scoreboard_incby(INTER_POLLS_DUR_ALL, afternow - now);
-         ganglia_scoreboard_incby(INTER_POLLS_DUR_RRD, afternow - now);
          
          if (r == 0)
             {
@@ -195,9 +191,8 @@ reconnect:
             }
       }
       
-    ganglia_scoreboard_incby(INTER_EXPORTS_TIME_EXP_ALL, apr_time_now() - start);
-    ganglia_scoreboard_incby(INTER_EXPORTS_TIME_EXP_RRDCACHED, apr_time_now() - start);
-    printf("TIME TAKEN RRDCACHED: %lu\n", apr_time_now() - start);
+    ganglia_scoreboard_incby(METS_ALL_DURATION, apr_time_now() - start);
+    ganglia_scoreboard_incby(METS_RRDCACHED_DURATION, apr_time_now() - start);
    return 0;
 }
 
@@ -344,15 +339,17 @@ push_data_to_rrd( char *rrd, const char *sum, const char *num,
             return rval;
       }
    if (gmetad_config.rrdcached_addrstr != NULL)
-      {
+   {
          ganglia_scoreboard_inc(METS_SENT_RRDCACHED);
          ganglia_scoreboard_inc(METS_SENT_ALL);
+         last_rrdcached = apr_time_now();
          return RRD_update_cached( rrd, sum, num, process_time );
       }
    else
       {
          ganglia_scoreboard_inc(METS_SENT_RRDTOOL);
          ganglia_scoreboard_inc(METS_SENT_ALL);
+         last_rrdtool = apr_time_now();
          return RRD_update( rrd, sum, num, process_time );
       }
 }
@@ -400,8 +397,7 @@ write_data_to_rrd ( const char *source, const char *host, const char *metric,
    strncat(rrd, ".rrd", PATHSIZE-strlen(rrd));
 
    ret = push_data_to_rrd( rrd, sum, num, step, process_time, slope);
-   ganglia_scoreboard_incby(INTER_EXPORTS_TIME_EXP_ALL, apr_time_now() - start);
-   ganglia_scoreboard_incby(INTER_EXPORTS_TIME_EXP_RRDTOOLS, apr_time_now() - start);
-   printf("TIME TAKEN RRDTOOLS: %lu\n", apr_time_now() - start);
+   ganglia_scoreboard_incby(METS_ALL_DURATION, apr_time_now() - start);
+   ganglia_scoreboard_incby(METS_RRDTOOLS_DURATION, apr_time_now() - start);
    return ret;
 }

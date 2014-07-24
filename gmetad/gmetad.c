@@ -67,6 +67,9 @@ apr_pool_t *global_context = NULL;
 /* When this gmetad was started */
 apr_time_t started;
 
+/* Last gmetad run */
+apr_time_t last_metadata;
+
 char hostname[HOSTNAMESZ];
 
 static int
@@ -264,28 +267,9 @@ void initialize_scoreboard()
 {
     ganglia_scoreboard_init(global_context);
     
-    ganglia_scoreboard_add(INTER_POLLS_NBR_ALL, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_POLLS_DUR_ALL, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_POLLS_TIM_ALL, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_POLLS_NBR_DATA, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_POLLS_DUR_DATA, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_POLLS_TIM_DATA, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_POLLS_NBR_CARBON, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_POLLS_DUR_CARBON, GSB_COUNTER);
-    //ganglia_scoreboard_add(INTER_POLLS_TIM_CARBON, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_POLLS_NBR_RRD, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_POLLS_DUR_RRD, GSB_COUNTER);
-    //ganglia_scoreboard_add(INTER_POLLS_TIM_RRD, GSB_COUNTER);
-    
-    /* This is done with the METS_SENT_...
-     ganglia_scoreboard_add(INTER_EXPORTS_NBR_ALL, GSB_COUNTER);
-     ganglia_scoreboard_add(INTER_EXPORTS_NBR_RRDTOOLS, GSB_COUNTER);
-     ganglia_scoreboard_add(INTER_EXPORTS_NBR_RRDCACHED, GSB_COUNTER);
-     ganglia_scoreboard_add(INTER_EXPORTS_NBR_GRAPHITE, GSB_COUNTER);
-     ganglia_scoreboard_add(INTER_EXPORTS_NBR_MEMCACHED, GSB_COUNTER);
-     ganglia_scoreboard_add(INTER_EXPORTS_NBR_RIEMANN, GSB_COUNTER);
-     */
-    //Will rename when done.
+    ganglia_scoreboard_add(DS_POLL_REQS, GSB_COUNTER);
+    ganglia_scoreboard_add(DS_POLL_DURATION, GSB_COUNTER);
+
     ganglia_scoreboard_add(METS_RECVD_ALL, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SENT_ALL, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SENT_RRDTOOL, GSB_COUNTER);
@@ -293,22 +277,26 @@ void initialize_scoreboard()
     ganglia_scoreboard_add(METS_SENT_GRAPHITE, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SENT_MEMCACHED, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SENT_RIEMANN, GSB_COUNTER);
-    
-    ganglia_scoreboard_add(INTER_EXPORTS_TIME_EXP_ALL, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_EXPORTS_TIME_EXP_RRDTOOLS, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_EXPORTS_TIME_EXP_RRDCACHED, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_EXPORTS_TIME_EXP_GRAPHITE, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_EXPORTS_TIME_EXP_MEMCACHED, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_EXPORTS_TIME_EXP_RIEMANN, GSB_COUNTER);
-    
-    ganglia_scoreboard_add(INTER_EXPORTS_LAST_EXP_ALL, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_EXPORTS_LAST_EXP_RRDTOOLS, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_EXPORTS_LAST_EXP_RRDCACHED, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_EXPORTS_LAST_EXP_GRAPHITE, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_EXPORTS_LAST_EXP_MEMCACHED, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_EXPORTS_LAST_EXP_RIEMANN, GSB_COUNTER);
-    /*
 
+    ganglia_scoreboard_add(METS_ALL_DURATION, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_RRDTOOLS_DURATION, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_RRDCACHED_DURATION, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_GRAPHITE_DURATION, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_MEMCACHED_DURATION, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_RIEMANN_DURATION, GSB_COUNTER);
+
+    ganglia_scoreboard_add(METS_SUMRZ_NUM, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_SUMRZ_DURATION, GSB_COUNTER);
+    
+    ganglia_scoreboard_add(NBR_TCP_REQS_ALL, GSB_COUNTER);
+    ganglia_scoreboard_add(TIME_TCP_REQS_ALL, GSB_COUNTER);
+    ganglia_scoreboard_add(NBR_TCP_REQS_XML, GSB_COUNTER);
+    ganglia_scoreboard_add(TIME_TCP_REQS_XML, GSB_COUNTER);
+    ganglia_scoreboard_add(NBR_TCP_REQS_INTXML, GSB_COUNTER);
+    ganglia_scoreboard_add(TIME_TCP_REQS_INTXML, GSB_COUNTER);
+    
+    
+    /*
      ganglia_scoreboard_add(INTER_IMPORTS_NBR_ALL, GSB_COUNTER);
      ganglia_scoreboard_add(INTER_IMPORTS_NBR_RRDTOOLS, GSB_COUNTER);
      ganglia_scoreboard_add(INTER_IMPORTS_NBR_RRDCACHED, GSB_COUNTER);
@@ -330,13 +318,6 @@ void initialize_scoreboard()
     ganglia_scoreboard_add(INTER_IMPORTS_LAST_EXP_MEMCACHED, GSB_COUNTER);
     ganglia_scoreboard_add(INTER_IMPORTS_LAST_EXP_RIEMANN, GSB_COUNTER);
     
-     * 
-     * #define INTER_REQUESTS_NBR_ALL "gmetad_internal_requests_nbr_all"
-     * #define INTER_REQUESTS_SERV_ALL "gmetad_internal_requests_serv_all"
-     * 
-     * #define INTER_PROCESSING_SUM_ALL "gmetad_internal_processing_sum_all"
-     * #define INTER_PROCESSING_TIME_SUM_ALL "gmetad_internal_processing_time_sum_all"
-     * #define INTER_PROCESSING_LAST_SUM_ALL "gmetad_internal_processing_last_sum_all"
     */
 }
 
@@ -406,7 +387,7 @@ main ( int argc, char *argv[] )
    struct passwd *pw;
    gmetad_config_t *c = &gmetad_config;
    apr_interval_time_t sleep_time;
-   apr_time_t last_metadata;
+   apr_time_t summary_started;
    double random_sleep_factor;
    unsigned int rand_seed;
 
@@ -631,7 +612,8 @@ main ( int argc, char *argv[] )
     /* Meta data */
    last_metadata = apr_time_now();
    for(;;)
-      {
+   {
+         ganglia_scoreboard_inc(METS_SUMRZ_NUM);
          /* Do at a random interval, between 
                  (shortest_step/2) +/- METADATA_SLEEP_RANDOMIZE percent */
          random_sleep_factor = (1 + (METADATA_SLEEP_RANDOMIZE / 50.0) * ((rand_r(&rand_seed) - RAND_MAX/2)/(float)RAND_MAX));
@@ -640,10 +622,11 @@ main ( int argc, char *argv[] )
          if(apr_time_sec(apr_time_now() + sleep_time) < (METADATA_MINIMUM_SLEEP + apr_time_sec(apr_time_now())))
             sleep_time += apr_time_from_sec(METADATA_MINIMUM_SLEEP);
          apr_sleep(sleep_time);
-
+         
          /* Need to be sure root is locked while doing summary */
          pthread_mutex_lock(root.sum_finished);
 
+         summary_started = apr_time_now();
          /* Flush the old values */
          hash_foreach(root.metric_summary, zero_out_summary, NULL);
          root.hosts_up = 0;
@@ -657,8 +640,9 @@ main ( int argc, char *argv[] )
 
          /* Save them to RRD */
          hash_foreach(root.metric_summary, write_root_summary, NULL);
-
+         
          /* Remember our last run */
+         ganglia_scoreboard_incby(METS_SUMRZ_DURATION, apr_time_now() - summary_started);
          last_metadata = apr_time_now();
       }
 

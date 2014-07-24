@@ -158,7 +158,7 @@ extern gmetad_config_t gmetad_config;
 extern char* getfield(char *buf, short int index);
 extern struct type_tag* in_type_list (char *, unsigned int);
 
-extern apr_time_t started;
+extern apr_time_t started, last_poll, last_rrdtool, last_rrdcached, last_memcached, last_graphite, last_riemann, last_metadata;
 
 extern char hostname[HOSTNAMESZ];
 
@@ -679,16 +679,64 @@ status_report( client_t *client , char *callback)
        "\"uptimeMillis\":%lu,"
        "\"metrics\":{"
        "\"received\":{"
-       "\"received_all\":%u"
+       "\"all\":%u"
        "},"
        "\"sent\":{"
-       "\"sent_all\":%u,"
-       "\"rrdtool\":%u,"
-       "\"rrdcached\":%u,"
-       "\"graphite\":%u,"
-       "\"memcached\":%u,"
-       "\"riemann\":%u"
-       "},",
+       "\"all\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u"
+       "},"
+       "\"rrdtool\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u,"
+       "\"lastTime\":%lu"
+       "},"
+       "\"rrdcached\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u,"
+       "\"lastTime\":%lu"
+       "},"
+       "\"graphite\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u,"
+       "\"lastTime\":%lu"
+       "},"
+       "\"memcached\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u,"
+       "\"lastTime\":%lu"
+       "},"
+       "\"riemann\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u,"
+       "\"lastTime\":%lu"
+       "}"
+       "},"
+       "\"summarize\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u,"
+       "\"lastTime\":%lu"
+       "},"
+       "\"requests\":{"
+       "\"all\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u"
+       "},"
+       "\"interactive\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u"
+       "},"
+       "\"xml\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u"
+       "}"
+       "},"
+       "\"polls\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%u,"
+       "\"lastTime\":%lu"
+       "},"
+       ,
        callback != NULL ? callback : "",
        callback != NULL ? "(" : "",
        hostname,
@@ -698,13 +746,36 @@ status_report( client_t *client , char *callback)
        (long int)(started / APR_TIME_C(1000)), // ms
        (long int)((now - started) / APR_USEC_PER_SEC), // seconds
        (long int)((now - started) / APR_TIME_C(1000)), // ms
-       ganglia_scoreboard_get("gmetad_metrics_recvd_all"),
-       ganglia_scoreboard_get("gmetad_metrics_sent_all"),
-       ganglia_scoreboard_get("gmetad_metrics_sent_rrdtool"),
-       ganglia_scoreboard_get("gmetad_metrics_sent_rrdcached"),
-       ganglia_scoreboard_get("gmetad_metrics_sent_graphite"),
-       ganglia_scoreboard_get("gmetad_metrics_sent_memcached"),
-       ganglia_scoreboard_get("gmetad_metrics_sent_riemann")
+       ganglia_scoreboard_get(METS_RECVD_ALL),
+       ganglia_scoreboard_get(METS_SENT_ALL),
+       ganglia_scoreboard_get(METS_ALL_DURATION),
+       ganglia_scoreboard_get(METS_SENT_RRDTOOL),
+       ganglia_scoreboard_get(METS_RRDTOOLS_DURATION),
+       (long int)(last_rrdtool / APR_TIME_C(1000)), // ms
+       ganglia_scoreboard_get(METS_SENT_RRDCACHED),
+       ganglia_scoreboard_get(METS_RRDCACHED_DURATION),
+       (long int)(last_rrdcached / APR_TIME_C(1000)), // ms
+       ganglia_scoreboard_get(METS_SENT_GRAPHITE),
+       ganglia_scoreboard_get(METS_GRAPHITE_DURATION),
+       (long int)(last_graphite / APR_TIME_C(1000)), // ms
+       ganglia_scoreboard_get(METS_SENT_MEMCACHED),
+       ganglia_scoreboard_get(METS_MEMCACHED_DURATION),
+       (long int)(last_memcached / APR_TIME_C(1000)), // ms
+       ganglia_scoreboard_get(METS_SENT_RIEMANN),
+       ganglia_scoreboard_get(METS_RIEMANN_DURATION),
+       (long int)(last_riemann / APR_TIME_C(1000)), // ms THIS ONE
+       ganglia_scoreboard_get(METS_SUMRZ_NUM),
+       ganglia_scoreboard_get(METS_SUMRZ_DURATION),
+       (long int)(last_metadata / APR_TIME_C(1000)), // ms
+       ganglia_scoreboard_get(NBR_TCP_REQS_ALL),
+       ganglia_scoreboard_get(TIME_TCP_REQS_ALL),
+       ganglia_scoreboard_get(NBR_TCP_REQS_INTXML),
+       ganglia_scoreboard_get(TIME_TCP_REQS_INTXML),
+       ganglia_scoreboard_get(NBR_TCP_REQS_XML),
+       ganglia_scoreboard_get(TIME_TCP_REQS_XML),
+       ganglia_scoreboard_get(DS_POLL_REQS),
+       ganglia_scoreboard_get(DS_POLL_DURATION),
+       (long int)(last_poll / APR_TIME_C(1000)) // ms
    );
 
    /* Get local metrics */
@@ -1065,23 +1136,29 @@ server_thread (void *arg)
    char request[REQUESTLEN + 1];
    llist_entry *le;
    datum_t rootdatum;
+   apr_time_t now = 0, afternow;
 
    for (;;)
       {
          client.valid = 0;
          len = sizeof(client.addr);
-
          if (interactive)
             {
                pthread_mutex_lock(&server_interactive_mutex);
                SYS_CALL( client.fd, accept(interactive_socket->sockfd, (struct sockaddr *) &(client.addr), &len));
                pthread_mutex_unlock(&server_interactive_mutex);
+               ganglia_scoreboard_inc(NBR_TCP_REQS_ALL);
+               ganglia_scoreboard_inc(NBR_TCP_REQS_INTXML);
+               now = apr_time_now();
             }
          else
-            {
+         {
                pthread_mutex_lock  ( &server_socket_mutex );
                SYS_CALL( client.fd, accept(server_socket->sockfd, (struct sockaddr *) &(client.addr), &len));
                pthread_mutex_unlock( &server_socket_mutex );
+               ganglia_scoreboard_inc(NBR_TCP_REQS_ALL);
+               ganglia_scoreboard_inc(NBR_TCP_REQS_XML);
+               now = apr_time_now();
             }
          if ( client.fd < 0 )
             {
@@ -1122,8 +1199,10 @@ server_thread (void *arg)
                      continue;
                   }
                debug_msg("server_thread() received request \"%s\" from %s", request, remote_ip);
-
                rc = process_request(&client, request);
+               afternow = apr_time_now();
+               ganglia_scoreboard_set(TIME_TCP_REQS_ALL, afternow - now);//Port 8652
+               ganglia_scoreboard_set(TIME_TCP_REQS_INTXML, afternow - now);
                if (rc == 1)
                   {
                      err_msg("Got a malformed path request from %s", remote_ip);
@@ -1137,8 +1216,10 @@ server_thread (void *arg)
                      continue;
                   }
             }
-         else
-            strcpy(request, "/");
+         else{
+             ganglia_scoreboard_inc(NBR_TCP_REQS_ALL);
+             strcpy(request, "/");
+         }
 
          if(root_report_start(&client))
             {
@@ -1159,6 +1240,11 @@ server_thread (void *arg)
                close(client.fd);
                continue;
             }
+            else{
+                afternow = apr_time_now();
+                ganglia_scoreboard_set(TIME_TCP_REQS_ALL, afternow - now);//Port 8651
+                ganglia_scoreboard_set(TIME_TCP_REQS_XML, afternow - now);
+         }
 
          if(root_report_end(&client))
             {
