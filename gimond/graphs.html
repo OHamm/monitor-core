@@ -1,1 +1,85 @@
- 
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Gmetad's metrics</title>
+        <link rel="stylesheet" href="stylesheet.css">
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+        <script type="text/javascript">
+            /* Google charts code */
+            google.load("visualization", "1", {packages:["corechart"]});
+            google.setOnLoadCallback(drawChart);
+
+            function drawChart() {
+                var data = google.visualization.arrayToDataTable(metrics_data);
+                var options = {
+                title: 'Example'
+                };
+
+                var chart = new google.visualization.LineChart(document.getElementById('metrics_graphs'));
+                chart.draw(data, options);
+            }
+            /* End Google charts code */
+            
+            var metrics_data = [["Date", "all", "rrdtool", "rrdcached", "graphite","memcached","riemann"]];
+            var tmpallvar = [0, 0], tmprrdtoolvar = [0, 0], tmprrdcachedvar = [0, 0], tmpgraphitevar = [0, 0], tmpmemcachedvar = [0, 0], tmpriemannvar = [0, 0];
+
+            var interval = 5000;
+            var timerId = setInterval(getMetrics, interval);
+            
+            function getMetrics(){
+                var Gmetad = "http://" + window.location.hostname + ":8652/status";
+                $.ajax({
+                    type: "GET",
+                    url: Gmetad,
+                    dataType: "jsonp",
+                    crossDomain: true,
+                    contentType: "application/json",
+                    jsonpCallback: "jsonCallback",
+                    error: function(data, textStatus, jqXHR) { alert("Update crashed, please reload the page..."); console.log(textStatus + " " + jqXHR.responseText);}
+                    /* If the logged error is "parsererror undefined", then the ajax() call couldn't parse the json data
+                    because there was a conflict with another call to ajax(), and sometimes the metrics won't update anymore. */
+                });
+                drawChart();
+            }getMetrics();
+
+            function jsonCallback(data){
+                var length = metrics_data.length;
+                metrics_data.push([new Date(data["stattime"]/1000),
+                                   ((data["metrics"]["sent"]["all"]["num"] - tmpallvar[0])/
+                                   ((data["metrics"]["sent"]["all"]["totalMillis"] - tmpallvar[1])/interval)),
+                                   ((data["metrics"]["sent"]["rrdtool"]["num"] - tmprrdtoolvar[0])/
+                                   ((data["metrics"]["sent"]["rrdtool"]["totalMillis"] - tmprrdtoolvar[1])/interval)),
+                                   ((data["metrics"]["sent"]["rrdcached"]["num"] - tmprrdcachedvar[0])/
+                                   ((data["metrics"]["sent"]["rrdcached"]["totalMillis"] - tmprrdcachedvar[1])/interval)),
+                                   ((data["metrics"]["sent"]["graphite"]["num"] - tmpgraphitevar[0])/
+                                   ((data["metrics"]["sent"]["graphite"]["totalMillis"] - tmpgraphitevar[1])/interval)),
+                                   ((data["metrics"]["sent"]["memcached"]["num"] - tmpmemcachedvar[0])/
+                                   ((data["metrics"]["sent"]["memcached"]["totalMillis"] - tmpmemcachedvar[1])/interval)),
+                                   ((data["metrics"]["sent"]["riemann"]["num"] - tmpriemannvar[0])/
+                                   ((data["metrics"]["sent"]["riemann"]["totalMillis"] - tmpriemannvar[1])/interval)),
+                                 ]);
+                tmpallvar[0] = data["metrics"]["sent"]["all"]["num"];
+                tmprrdtoolvar[0] = data["metrics"]["sent"]["rrdtool"]["num"];
+                tmprrdcachedvar[0] = data["metrics"]["sent"]["rrdcached"]["num"];
+                tmpgraphitevar[0] = data["metrics"]["sent"]["graphite"]["num"];
+                tmpmemcachedvar[0] = data["metrics"]["sent"]["memcached"]["num"];
+                tmpriemannvar[0] = data["metrics"]["sent"]["riemann"]["num"];
+                
+                tmpallvar[1] = data["metrics"]["sent"]["all"]["totalMillis"];
+                tmprrdtoolvar[1] = data["metrics"]["sent"]["rrdtool"]["totalMillis"];
+                tmprrdcachedvar[1] = data["metrics"]["sent"]["rrdcached"]["totalMillis"];
+                tmpgraphitevar[1] = data["metrics"]["sent"]["graphite"]["totalMillis"];
+                tmpmemcachedvar[1] = data["metrics"]["sent"]["memcached"]["totalMillis"];
+                tmpriemannvar[1] = data["metrics"]["sent"]["riemann"]["totalMillis"];
+            }
+            
+        </script>
+    </head>
+    
+    <body>
+    <div id="metrics_graphs" style="height: 500px; width: 800px; "></div>
+    </body>
+</html>  
