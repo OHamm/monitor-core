@@ -294,30 +294,10 @@ void initialize_scoreboard()
     ganglia_scoreboard_add(TIME_TCP_REQS_XML, GSB_COUNTER);
     ganglia_scoreboard_add(NBR_TCP_REQS_INTXML, GSB_COUNTER);
     ganglia_scoreboard_add(TIME_TCP_REQS_INTXML, GSB_COUNTER);
-    
-    
+
     /*
-     ganglia_scoreboard_add(INTER_IMPORTS_NBR_ALL, GSB_COUNTER);
-     ganglia_scoreboard_add(INTER_IMPORTS_NBR_RRDTOOLS, GSB_COUNTER);
-     ganglia_scoreboard_add(INTER_IMPORTS_NBR_RRDCACHED, GSB_COUNTER);
-     ganglia_scoreboard_add(INTER_IMPORTS_NBR_GRAPHITE, GSB_COUNTER);
-     ganglia_scoreboard_add(INTER_IMPORTS_NBR_MEMCACHED, GSB_COUNTER);
-     ganglia_scoreboard_add(INTER_IMPORTS_NBR_RIEMANN, GSB_COUNTER);
-    
-    ganglia_scoreboard_add(INTER_IMPORTS_TIME_EXP_ALL, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_IMPORTS_TIME_EXP_RRDTOOLS, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_IMPORTS_TIME_EXP_RRDCACHED, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_IMPORTS_TIME_EXP_GRAPHITE, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_IMPORTS_TIME_EXP_MEMCACHED, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_IMPORTS_TIME_EXP_RIEMANN, GSB_COUNTER);
-    
-    ganglia_scoreboard_add(INTER_IMPORTS_LAST_EXP_ALL, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_IMPORTS_LAST_EXP_RRDTOOLS, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_IMPORTS_LAST_EXP_RRDCACHED, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_IMPORTS_LAST_EXP_GRAPHITE, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_IMPORTS_LAST_EXP_MEMCACHED, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_IMPORTS_LAST_EXP_RIEMANN, GSB_COUNTER);
-    
+     ganglia_scoreboard_add(INTER_LATENCY_TIME_ALL);"
+     ganglia_scoreboard_add(INTER_LATENCY__ALL);
     */
 }
 

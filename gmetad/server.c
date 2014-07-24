@@ -19,9 +19,12 @@
 
 #define HOSTNAMESZ 64
 
-/* Local metrics */
+/*
+ * These metrics are identical to gmond's metrics. (gmond -m)
+ * If new metrics are added to gmond they can be added here.
+ * 
+ */
 #include "libmetrics.h"
-
 static const struct metricinfo
 {
   const char *name;
@@ -783,8 +786,8 @@ status_report( client_t *client , char *callback)
    metric_init();
    /*
     * If buffers get too small because new metrics are added, just up the size
-    * of METRICSBUFSIZE,
-    * the extra space will be cut when the buffer is inserted in the JSON.
+    * of METRICSBUFSIZE, the extra space will be cut when the buffer is inserted
+    * in the JSON.
     */
    char coreBuf[METRICSBUFSIZE], cpuBuf[METRICSBUFSIZE], diskBuf[METRICSBUFSIZE],
    loadBuf[METRICSBUFSIZE], memoryBuf[METRICSBUFSIZE], networkBuf[METRICSBUFSIZE],
@@ -819,7 +822,8 @@ status_report( client_t *client , char *callback)
          coreOffset += snprintf (coreBuf + coreOffset, METRICSBUFSIZE > coreOffset ? METRICSBUFSIZE - coreOffset : 0, "\"%s\":\"%\",", metrics[i].name, );
       }
       */
-      else if(strcmp(metrics[i].name, "cpu_steal") == 0){
+      else if(strcmp(metrics[i].name, "cpu_steal") == 0 ||
+              strcmp(metrics[i].name, "cpu_num") == 0){
          cpuOffset += snprintf (cpuBuf + cpuOffset, METRICSBUFSIZE > cpuOffset ? METRICSBUFSIZE - cpuOffset : 0, "\"%s\":%d,", metrics[i].name, (unsigned int) val.uint16);
       }else if(strcmp(metrics[i].name, "cpu_intr") == 0 ||
                strcmp(metrics[i].name, "cpu_sintr") == 0 ||
@@ -830,8 +834,6 @@ status_report( client_t *client , char *callback)
                strcmp(metrics[i].name, "cpu_system") == 0 ||
                strcmp(metrics[i].name, "cpu_wio") == 0){
          cpuOffset += snprintf (cpuBuf + cpuOffset, METRICSBUFSIZE > cpuOffset ? METRICSBUFSIZE - cpuOffset : 0, "\"%s\":%f,", metrics[i].name, val.f);
-      }else if(strcmp(metrics[i].name, "cpu_num") == 0){
-         cpuOffset += snprintf (cpuBuf + cpuOffset, METRICSBUFSIZE > cpuOffset ? METRICSBUFSIZE - cpuOffset : 0, "\"%s\":%d,", metrics[i].name, (unsigned int) val.uint16);
       }else if(strcmp(metrics[i].name, "cpu_speed") == 0){
          cpuOffset += snprintf (cpuBuf + cpuOffset, METRICSBUFSIZE > cpuOffset ? METRICSBUFSIZE - cpuOffset : 0, "\"%s\":%u,", metrics[i].name, (unsigned int) val.uint32);
       }else if(strcmp(metrics[i].name, "disk_free") == 0 ||
@@ -898,7 +900,8 @@ status_report( client_t *client , char *callback)
 #endif
     /*
      * If new metrics are added but are not sorted in the buffers,
-     * they'll show up here and will be added to the "otherBuf" buffer.
+     * they'll show up here and will be added to the "otherBuf" buffer,
+     * and they'll be in the "other" nest.
      */
       else{
          switch (metrics[i].type){
@@ -946,7 +949,12 @@ status_report( client_t *client , char *callback)
    systemOffset += snprintf (systemBuf + (systemOffset - 1), METRICSBUFSIZE > systemOffset ? METRICSBUFSIZE - systemOffset : 0, "},") - 1;
    otherOffset += snprintf (otherBuf + (otherOffset - 1), METRICSBUFSIZE > otherOffset ? METRICSBUFSIZE - otherOffset : 0, "},") - 1;
    
-   /* If something was written in buffer */
+   /*
+    * The length depends on the name of the nest (see higher up).
+    * If nothing was written then the buffer will look like: ' "example":}, ',
+    * not: ' "example":{}, ', because the last char is replaced by "},".
+    * Hence these numbers.
+    */
    if(coreOffset != 9){
       offset += snprintf (buf + offset, BUFSIZE > offset ? BUFSIZE - offset : 0, "%s", coreBuf);
    }
@@ -974,7 +982,11 @@ status_report( client_t *client , char *callback)
    if(otherOffset != 10){
       offset += snprintf (buf + offset, BUFSIZE > offset ? BUFSIZE - offset : 0, "%s", otherBuf);
    }
-   /* Remove trailing , */
+   
+   /*
+    * Remove trailing "," and replace by what's needed, depending on the
+    * existence of a callback function for the JSON data (see JSONP).
+    */
    snprintf (buf + (offset - 1), BUFSIZE > offset - 1 ? BUFSIZE - (offset + 1) : 0,  callback != NULL ? "}})\r\n" : "}}\r\n");
    
    /* End local metrics */

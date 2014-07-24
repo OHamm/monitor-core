@@ -43,27 +43,6 @@ typedef enum ganglia_scoreboard_types ganglia_scoreboard_types;
 #define METS_SUMRZ_DURATION "mets_sumrz_duration"
 
 /*
-#define INTER_IMPORTS_NBR_ALL "gmetad_internal_imports_nbr_all"
-#define INTER_IMPORTS_NBR_RRDTOOLS "gmetad_internal_imports_nbr_rrdtools"
-#define INTER_IMPORTS_NBR_RRDCACHED "gmetad_internal_imports_nbr_rrdcached"
-#define INTER_IMPORTS_NBR_GRAPHITE "gmetad_internal_imports_nbr_graphite"
-#define INTER_IMPORTS_NBR_MEMCACHED "gmetad_internal_imports_nbr_memcached"
-#define INTER_IMPORTS_NBR_RIEMANN "gmetad_internal_imports_nbr_riemann"
-
-#define INTER_IMPORTS_TIME_EXP_ALL "gmetad_internal_imports_nbr_exp_time_all"
-#define INTER_IMPORTS_TIME_EXP_RRDTOOLS "gmetad_internal_imports_nbr_exp_time_rrdtools"
-#define INTER_IMPORTS_TIME_EXP_RRDCACHED "gmetad_internal_imports_nbr_exp_time_rrdcached"
-#define INTER_IMPORTS_TIME_EXP_GRAPHITE "gmetad_internal_imports_nbr_exp_time_graphite"
-#define INTER_IMPORTS_TIME_EXP_MEMCACHED "gmetad_internal_imports_nbr_exp_time_memcached"
-#define INTER_IMPORTS_TIME_EXP_RIEMANN "gmetad_internal_imports_nbr_exp_time_riemann"
-
-#define INTER_IMPORTS_LAST_EXP_ALL "gmetad_internal_imports_nbr_last_exp_all"
-#define INTER_IMPORTS_LAST_EXP_RRDTOOLS "gmetad_internal_imports_nbr_last_exp_rrdtools"
-#define INTER_IMPORTS_LAST_EXP_RRDCACHED "gmetad_internal_imports_nbr_last_exp_rrdcached"
-#define INTER_IMPORTS_LAST_EXP_GRAPHITE "gmetad_internal_imports_nbr_last_exp_graphite"
-#define INTER_IMPORTS_LAST_EXP_MEMCACHED "gmetad_internal_imports_nbr_last_exp_memcached"
-#define INTER_IMPORTS_LAST_EXP_RIEMANN "gmetad_internal_imports_nbr_last_exp_riemann"
-
 #define INTER_LATENCY_TIME_ALL "gmetad_internal_latency_time_all"
 #define INTER_LATENCY__ALL "gmetad_internal_latency__all"
 */
