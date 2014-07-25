@@ -8,26 +8,46 @@
         <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 
         <script type="text/javascript">
+        
+            var metrics_data;
+            var chart;
+            var interval = 10000;//ms
+            var timerId = null;
+            var interval_time = 3600000;//1 hour in ms
+
             /* Google charts code */
+            
             google.load("visualization", "1", {packages:["corechart"]});
-            google.setOnLoadCallback(drawChart);
+            google.setOnLoadCallback(setVars);
 
-            function drawChart() {
-                var data = google.visualization.arrayToDataTable(metrics_data);
+            function setVars(){
+                chart = new google.visualization.LineChart(document.getElementById('metrics_graphs'));
+                metrics_data = [["Date", "All", "Rrdtool", "Rrdcached", "Graphite","Memcached","Riemann"]];
+                getMetrics();
+                timerId = setInterval(getMetrics, interval);
+            }
+            function drawChart(){
+                var last_time = metrics_data[metrics_data.length - 1][0].getTime() - interval_time;
+                var i = 1;
+                //need minimum of 2 points for a line.
+                for(;i<metrics_data.length-1;i++){
+                    if(last_time <= metrics_data[i][0].getTime()){
+                        break;
+                    }
+                }
+                    metrics_data.splice(1,i-1);//array is sorted!
                 var options = {
-                title: 'Example'
+                    title: 'Example',
+                    width: 900,
+                    height: 120,
+                    hAxis: {viewWindow: {min: metrics_data[1][0], max: new Date(metrics_data[1][0].getTime() + interval_time)}}
                 };
-
-                var chart = new google.visualization.LineChart(document.getElementById('metrics_graphs'));
+                var data = google.visualization.arrayToDataTable(metrics_data);
                 chart.draw(data, options);
             }
             /* End Google charts code */
             
-            var metrics_data = [["Date", "all", "rrdtool", "rrdcached", "graphite","memcached","riemann"]];
             var tmpallvar = [0, 0], tmprrdtoolvar = [0, 0], tmprrdcachedvar = [0, 0], tmpgraphitevar = [0, 0], tmpmemcachedvar = [0, 0], tmpriemannvar = [0, 0];
-
-            var interval = 5000;
-            var timerId = setInterval(getMetrics, interval);
             
             function getMetrics(){
                 var Gmetad = "http://" + window.location.hostname + ":8652/status";
@@ -42,11 +62,9 @@
                     /* If the logged error is "parsererror undefined", then the ajax() call couldn't parse the json data
                     because there was a conflict with another call to ajax(), and sometimes the metrics won't update anymore. */
                 });
-                drawChart();
-            }getMetrics();
+            }
 
             function jsonCallback(data){
-                var length = metrics_data.length;
                 metrics_data.push([new Date(data["stattime"]/1000),
                                    ((data["metrics"]["sent"]["all"]["num"] - tmpallvar[0])/
                                    ((data["metrics"]["sent"]["all"]["totalMillis"] - tmpallvar[1])/interval)),
@@ -74,12 +92,14 @@
                 tmpgraphitevar[1] = data["metrics"]["sent"]["graphite"]["totalMillis"];
                 tmpmemcachedvar[1] = data["metrics"]["sent"]["memcached"]["totalMillis"];
                 tmpriemannvar[1] = data["metrics"]["sent"]["riemann"]["totalMillis"];
+
+                drawChart();
             }
             
         </script>
     </head>
     
     <body>
-    <div id="metrics_graphs" style="height: 500px; width: 800px; "></div>
+    <div id="metrics_graphs" style="height: 120px; width: 900px; "></div>
     </body>
 </html>  
