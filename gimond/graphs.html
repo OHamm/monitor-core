@@ -9,26 +9,48 @@
 
         <script type="text/javascript">
         
-            var sent_data, cpu_data;
-            var sent_chart, cpu_chart;
-            var interval;
+            var sent_data, sent_time_data, cpu_data, poll_data, poll_time_data, recv_data, sumrz_data, sumrz_time_data, req_data, req_time_data;
+            var sent_chart, sent_time_chart, cpu_chart, poll_chart, poll_time_chart, recv_chart, sumrz_chart, sumrz_time_chart, req_chart, req_time_chart;
+            var interval = 60000; // 1min
             var timerId = null;
             var timespawn;
             var tmpsentallvar, tmprrdtoolvar, tmprrdcachedvar, tmpgraphitevar, tmpmemcachedvar, tmpriemannvar;
+            var tmppollvar, tmpsumrzvar, tmpreqallvar, tmpinteractivevar, tmpxmlvar;
+            var tmprecvvar;
 
             /* Google charts code */
             
             google.load("visualization", "1", {packages:["corechart"]});
-            google.setOnLoadCallback(setVars);
+            google.setOnLoadCallback(begin);
 
             function setVars(){
                 sent_chart = new google.visualization.LineChart(document.getElementById('Sent'));
+                sent_time_chart = new google.visualization.LineChart(document.getElementById('Sent_time'));
                 cpu_chart = new google.visualization.LineChart(document.getElementById('Cpu'));
+                poll_chart = new google.visualization.LineChart(document.getElementById('Polls'));
+                poll_time_chart = new google.visualization.LineChart(document.getElementById('Poll_time'));
+                recv_chart = new google.visualization.LineChart(document.getElementById('Received'));
+                sumrz_chart = new google.visualization.LineChart(document.getElementById('Summarized'));
+                sumrz_time_chart = new google.visualization.LineChart(document.getElementById('Summarized_time'));
+                req_chart = new google.visualization.LineChart(document.getElementById('Requests'));
+                req_time_chart = new google.visualization.LineChart(document.getElementById('Requests_time'));
+                
                 sent_data = [["Date", "All", "Rrdtool", "Rrdcached", "Graphite","Memcached","Riemann"]];
+                sent_time_data = [["Date", "All", "Rrdtool", "Rrdcached", "Graphite","Memcached","Riemann"]];
                 cpu_data = [["Date", "User", "Nice", "System", "Idle"]];
+                poll_data = [["Date", "Polls"]];
+                poll_time_data = [["Date", "Time"]];
+                recv_data = [["Date", "Received"]];
+                sumrz_data = [["Date", "Summarized"]];
+                sumrz_time_data = [["Date", "Time"]];
+                req_data = [["Date", "All", "Interactive", "xml"]];
+                req_time_data = [["Date", "All", "Interactive", "xml"]];
                 tmpsentallvar = [0, 0]; tmprrdtoolvar = [0, 0];
                 tmprrdcachedvar = [0, 0]; tmpgraphitevar = [0, 0];
                 tmpmemcachedvar = [0, 0]; tmpriemannvar = [0, 0];
+                tmppollvar = [0, 0]; tmprecvvar = 0;
+                tmpsumrzvar = [0, 0]; tmpreqallvar = [0, 0];
+                tmpinteractivevar = [0, 0]; tmpxmlvar = [0, 0];
             }
             function drawChart(name, metrics_data){
                 var last_time = metrics_data[metrics_data.length - 1][0].getTime() - timespawn;
@@ -44,15 +66,40 @@
                     title: name,
                     width: 900,
                     height: 120,
-                    hAxis: {viewWindow: {min: metrics_data[1][0], max: new Date(metrics_data[1][0].getTime() + timespawn)}}
+                    hAxis: {viewWindow: {min: metrics_data[1][0], max: new Date(metrics_data[1][0].getTime() + timespawn)}},
+                    vAxis: {viewWindow: {min: 0}}
                 };
                 var data = google.visualization.arrayToDataTable(metrics_data);
                 switch (name){
                     case "Sent":
                         sent_chart.draw(data, options);
                     break;
+                    case "Sent_time":
+                        sent_time_chart.draw(data, options);
+                    break;
                     case "Cpu":
                         cpu_chart.draw(data, options);
+                    break;
+                    case "Polls":
+                        poll_chart.draw(data, options);
+                    break;
+                    case "Poll_time":
+                        poll_time_chart.draw(data, options);
+                    break;
+                    case "Received":
+                        recv_chart.draw(data, options);
+                    break;
+                    case "Summarized":
+                        sumrz_chart.draw(data, options);
+                    break;
+                    case "Summarize_time":
+                        sumrz_time_chart.draw(data, options);
+                    break;
+                    case "Requests":
+                        req_chart.draw(data, options);
+                    break;
+                    case "Requests_time":
+                        req_time_chart.draw(data, options);
                     break;
                     default:
                     break;
@@ -78,19 +125,26 @@
             /* Example of a chart with a delta */
             function jsonCallback(data){
                 sent_data.push([new Date(data["stattime"]/1000),
-                                   ((data["metrics"]["sent"]["all"]["num"] - tmpsentallvar[0])/
-                                   ((data["metrics"]["sent"]["all"]["totalMillis"] - tmpsentallvar[1])/interval)),
-                                   ((data["metrics"]["sent"]["rrdtool"]["num"] - tmprrdtoolvar[0])/
-                                   ((data["metrics"]["sent"]["rrdtool"]["totalMillis"] - tmprrdtoolvar[1])/interval)),
-                                   ((data["metrics"]["sent"]["rrdcached"]["num"] - tmprrdcachedvar[0])/
-                                   ((data["metrics"]["sent"]["rrdcached"]["totalMillis"] - tmprrdcachedvar[1])/interval)),
-                                   ((data["metrics"]["sent"]["graphite"]["num"] - tmpgraphitevar[0])/
-                                   ((data["metrics"]["sent"]["graphite"]["totalMillis"] - tmpgraphitevar[1])/interval)),
-                                   ((data["metrics"]["sent"]["memcached"]["num"] - tmpmemcachedvar[0])/
-                                   ((data["metrics"]["sent"]["memcached"]["totalMillis"] - tmpmemcachedvar[1])/interval)),
-                                   ((data["metrics"]["sent"]["riemann"]["num"] - tmpriemannvar[0])/
-                                   ((data["metrics"]["sent"]["riemann"]["totalMillis"] - tmpriemannvar[1])/interval))
+
+                                    (tmpsentallvar[0] != 0 ? (data["metrics"]["sent"]["all"]["num"] - tmpsentallvar[0]) : 0),
+                                    (tmprrdtoolvar[0] != 0 ? (data["metrics"]["sent"]["rrdtool"]["num"] - tmprrdtoolvar[0]) : 0),
+                                    (tmprrdcachedvar[0] != 0 ? (data["metrics"]["sent"]["rrdcached"]["num"] - tmprrdcachedvar[0]) : 0),
+                                    (tmpgraphitevar[0] != 0 ? (data["metrics"]["sent"]["graphite"]["num"] - tmpgraphitevar[0]) : 0),
+                                    (tmpmemcachedvar[0] != 0 ? (data["metrics"]["sent"]["memcached"]["num"] - tmpmemcachedvar[0]) : 0),
+                                    (tmpriemannvar[0] != 0 ? (data["metrics"]["sent"]["riemann"]["num"] - tmpriemannvar[0]) : 0)
                                  ]);
+                drawChart('Sent', sent_data);
+
+                sent_time_data.push([new Date(data["stattime"]/1000),
+                                    (tmpsentallvar[1] != 0 ? (data["metrics"]["sent"]["all"]["totalMillis"] - tmpsentallvar[1]) : 0),
+                                    (tmprrdtoolvar[1] != 0 ? (data["metrics"]["sent"]["rrdtool"]["totalMillis"] - tmprrdtoolvar[1]) : 0),
+                                    (tmprrdcachedvar[1] != 0 ? (data["metrics"]["sent"]["rrdcached"]["totalMillis"] - tmprrdcachedvar[1]) : 0),
+                                    (tmpgraphitevar[1] != 0 ? (data["metrics"]["sent"]["graphite"]["totalMillis"] - tmpgraphitevar[1]) : 0),
+                                    (tmpmemcachedvar[1] != 0 ? (data["metrics"]["sent"]["memcached"]["totalMillis"] - tmpmemcachedvar[1]) : 0),
+                                    (tmpriemannvar[1] != 0 ? (data["metrics"]["sent"]["riemann"]["totalMillis"] - tmpriemannvar[1]) : 0)
+                                 ]);
+                drawChart('Sent_time', sent_time_data);
+                
                 tmpsentallvar[0] = data["metrics"]["sent"]["all"]["num"];
                 tmprrdtoolvar[0] = data["metrics"]["sent"]["rrdtool"]["num"];
                 tmprrdcachedvar[0] = data["metrics"]["sent"]["rrdcached"]["num"];
@@ -105,9 +159,62 @@
                 tmpmemcachedvar[1] = data["metrics"]["sent"]["memcached"]["totalMillis"];
                 tmpriemannvar[1] = data["metrics"]["sent"]["riemann"]["totalMillis"];
 
-                drawChart('Sent', sent_data);
                 /* End example */
+
+                poll_data.push([new Date(data["stattime"]/1000),
+                                    (tmppollvar[0] != 0 ? (data["metrics"]["polls"]["num"] - tmppollvar[0]) : 0)
+                                 ]);
+                drawChart('Polls', poll_data);
                 
+                poll_time_data.push([new Date(data["stattime"]/1000),
+                                    (tmppollvar[1] != 0 ? (data["metrics"]["polls"]["totalMillis"] - tmppollvar[1]) : 0)
+                                 ]);
+                drawChart('Poll_time', poll_time_data);
+
+                tmppollvar[0] = data["metrics"]["polls"]["num"];
+                tmppollvar[1] = data["metrics"]["polls"]["totalMillis"];
+
+                recv_data.push([new Date(data["stattime"]/1000),
+                                   (tmprecvvar != 0 ? (data["metrics"]["received"]["all"] - tmprecvvar) : 0)
+                                 ]);
+                tmprecvvar = data["metrics"]["received"]["all"];
+                drawChart('Received', recv_data);
+
+                sumrz_data.push([new Date(data["stattime"]/1000),
+                                    (tmpsumrzvar[0] != 0 ? (data["metrics"]["summarize"]["num"] - tmpsumrzvar[0]) : 0)
+                                 ]);
+                drawChart('Summarized', sumrz_data);
+
+                sumrz_time_data.push([new Date(data["stattime"]/1000),
+                                    (tmpsumrzvar[1] != 0 ? (data["metrics"]["summarize"]["totalMillis"] - tmpsumrzvar[1]) : 0)
+                                 ]);
+                drawChart('Summarize_time', sumrz_time_data);
+
+                tmpsumrzvar[0] = data["metrics"]["summarize"]["num"];
+                tmpsumrzvar[1] = data["metrics"]["summarize"]["totalMillis"];
+
+
+                req_data.push([new Date(data["stattime"]/1000),
+                                    (tmpreqallvar[0] != 0 ? (data["metrics"]["requests"]["all"]["num"] - tmpreqallvar[0]) : 0),
+                                    (tmpinteractivevar[0] != 0 ? (data["metrics"]["requests"]["interactive"]["num"] - tmpinteractivevar[0]) : 0),
+                                    (tmpxmlvar[0] != 0 ? (data["metrics"]["requests"]["xml"]["num"] - tmpxmlvar[0]) : 0)
+                                 ]);
+                drawChart('Requests', req_data);
+
+                req_time_data.push([new Date(data["stattime"]/1000),
+                                    (tmpreqallvar[1] != 0 ? (data["metrics"]["requests"]["all"]["totalMillis"] - tmpreqallvar[1]) : 0),
+                                    (tmpinteractivevar[1] != 0 ? (data["metrics"]["requests"]["interactive"]["totalMillis"] - tmpinteractivevar[1]) : 0),
+                                    (tmpxmlvar[1] != 0 ? (data["metrics"]["requests"]["xml"]["totalMillis"] - tmpxmlvar[1]) : 0)
+                                 ]);
+                drawChart('Requests_time', req_time_data);
+
+                tmpreqallvar[0] = data["metrics"]["requests"]["all"]["num"];
+                tmpreqallvar[1] = data["metrics"]["requests"]["all"]["totalMillis"];
+                tmpinteractivevar[0] = data["metrics"]["requests"]["interactive"]["num"];
+                tmpinteractivevar[1] = data["metrics"]["requests"]["interactive"]["totalMillis"];
+                tmpxmlvar[0] = data["metrics"]["requests"]["xml"]["num"];
+                tmpxmlvar[1] = data["metrics"]["requests"]["xml"]["totalMillis"];
+
                 /* Example of a "normal" chart */
                 cpu_data.push([new Date(data["stattime"]/1000),
                                    data["metrics"]["cpu"]["cpu_user"],
@@ -124,9 +231,9 @@
                 var e = document.getElementById(txt);
                 return e.options[e.selectedIndex].value;
             }
+            
             function updateMetrics(){
                 if(document.getElementById("update").value == "Update"){
-                    interval = retrieveDropVal("interval") * 1000;//sec
                     timespawn = retrieveDropVal("timespawn") * 60000;//min
                     document.getElementById("update").value = "Stop";
                     $('#update').text("Stop");
@@ -141,6 +248,10 @@
                 }
             }
             
+            function begin(){
+                setVars();
+                updateMetrics();
+            }
         </script>
     </head>
     
@@ -148,22 +259,19 @@
     
     <!-- Graphs -->
     <div id="Sent" style="height: 120px; width: 900px; "></div>
+    <div id="Sent_time" style="height: 120px; width: 900px; "></div>
+    <div id="Polls" style="height: 120px; width: 900px; "></div>
+    <div id="Poll_time" style="height: 120px; width: 900px; "></div>
+    <div id="Received" style="height: 120px; width: 900px; "></div>
+    <div id="Summarized" style="height: 120px; width: 900px; "></div>
+    <div id="Summarized_time" style="height: 120px; width: 900px; "></div>
+    <div id="Requests" style="height: 120px; width: 900px; "></div>
+    <div id="Requests_time" style="height: 120px; width: 900px; "></div>
     <div id="Cpu" style="height: 120px; width: 900px; "></div>
     <!--End Graphs -->
     
     <div id="buttons">
         <button type="button" id="update" value="Update" onclick="updateMetrics()">Update</button>
-
-        <label>
-            <select id="interval">
-                <option value=10>10</option>
-                <option value=15>15</option>
-                <option value=30>30</option>
-                <option value=60>60</option>
-            </select>
-            Interval (s)
-        </label>
-
         <label>
             <select id="timespawn">
                 <option value=10>10</option>
