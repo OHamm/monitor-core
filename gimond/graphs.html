@@ -11,7 +11,7 @@
         
             var sent_data, sent_time_data, cpu_data, poll_data, poll_time_data, recv_data, sumrz_data, sumrz_time_data, req_data, req_time_data;
             var sent_chart, sent_time_chart, cpu_chart, poll_chart, poll_time_chart, recv_chart, sumrz_chart, sumrz_time_chart, req_chart, req_time_chart;
-            var interval = 60000; // 1min
+            var interval = 60000; //1 min
             var timerId = null;
             var timespawn;
             var tmpsentallvar, tmprrdtoolvar, tmprrdcachedvar, tmpgraphitevar, tmpmemcachedvar, tmpriemannvar;
@@ -24,6 +24,7 @@
             google.setOnLoadCallback(begin);
 
             function setVars(){
+                timespawn = retrieveDropVal("timespawn") * 60000; //mins
                 sent_chart = new google.visualization.LineChart(document.getElementById('Sent'));
                 sent_time_chart = new google.visualization.LineChart(document.getElementById('Sent_time'));
                 cpu_chart = new google.visualization.LineChart(document.getElementById('Cpu'));
@@ -234,7 +235,6 @@
             
             function updateMetrics(){
                 if(document.getElementById("update").value == "Update"){
-                    timespawn = retrieveDropVal("timespawn") * 60000;//min
                     document.getElementById("update").value = "Stop";
                     $('#update').text("Stop");
                     getMetrics();
@@ -246,6 +246,10 @@
                     setVars();
                     clearTimeout(timerId);
                 }
+            }
+
+            function changetimespawn(){
+                timespawn = retrieveDropVal("timespawn") * 60000; //mins
             }
             
             function begin(){
@@ -273,7 +277,7 @@
     <div id="buttons">
         <button type="button" id="update" value="Update" onclick="updateMetrics()">Update</button>
         <label>
-            <select id="timespawn">
+            <select id="timespawn" onchange="changetimespawn()">
                 <option value=10>10</option>
                 <option value=20>20</option>
                 <option value=30>30</option>
