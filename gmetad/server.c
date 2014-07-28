@@ -1196,8 +1196,8 @@ server_thread (void *arg)
                debug_msg("server_thread() received request \"%s\" from %s", request, remote_ip);
                rc = process_request(&client, request);
                afternow = apr_time_now();
-               ganglia_scoreboard_set(TIME_TCP_REQS_ALL, afternow - now);//Port 8652
-               ganglia_scoreboard_set(TIME_TCP_REQS_INTXML, afternow - now);
+               ganglia_scoreboard_incby(TIME_TCP_REQS_ALL, afternow - now);//Port 8652
+               ganglia_scoreboard_incby(TIME_TCP_REQS_INTXML, afternow - now);
                if (rc == 1)
                   {
                      err_msg("Got a malformed path request from %s", remote_ip);
@@ -1237,8 +1237,8 @@ server_thread (void *arg)
             }
             else{
                 afternow = apr_time_now();
-                ganglia_scoreboard_set(TIME_TCP_REQS_ALL, afternow - now);//Port 8651
-                ganglia_scoreboard_set(TIME_TCP_REQS_XML, afternow - now);
+                ganglia_scoreboard_incby(TIME_TCP_REQS_ALL, afternow - now);//Port 8651
+                ganglia_scoreboard_incby(TIME_TCP_REQS_XML, afternow - now);
          }
 
          if(root_report_end(&client))
