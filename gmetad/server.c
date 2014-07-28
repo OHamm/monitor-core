@@ -688,56 +688,56 @@ status_report( client_t *client , char *callback)
        "\"sent\":{"
        "\"all\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u"
+       "\"totalMillis\":%lu"
        "},"
        "\"rrdtool\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u,"
+       "\"totalMillis\":%lu,"
        "\"lastTime\":%lu"
        "},"
        "\"rrdcached\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u,"
+       "\"totalMillis\":%lu,"
        "\"lastTime\":%lu"
        "},"
        "\"graphite\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u,"
+       "\"totalMillis\":%lu,"
        "\"lastTime\":%lu"
        "},"
        "\"memcached\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u,"
+       "\"totalMillis\":%lu,"
        "\"lastTime\":%lu"
        "},"
        "\"riemann\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u,"
+       "\"totalMillis\":%lu,"
        "\"lastTime\":%lu"
        "}"
        "},"
        "\"summarize\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u,"
+       "\"totalMillis\":%lu,"
        "\"lastTime\":%lu"
        "},"
        "\"requests\":{"
        "\"all\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u"
+       "\"totalMillis\":%lu"
        "},"
        "\"interactive\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u"
+       "\"totalMillis\":%lu"
        "},"
        "\"xml\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u"
+       "\"totalMillis\":%lu"
        "}"
        "},"
        "\"polls\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u,"
+       "\"totalMillis\":%lu,"
        "\"lastTime\":%lu"
        "},"
        ,
@@ -752,33 +752,33 @@ status_report( client_t *client , char *callback)
        (long int)((now - started) / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(METS_RECVD_ALL),
        ganglia_scoreboard_get(METS_SENT_ALL),
-       ganglia_scoreboard_get(METS_ALL_DURATION),
+       (long int)(ganglia_scoreboard_get(METS_ALL_DURATION) / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(METS_SENT_RRDTOOL),
-       ganglia_scoreboard_get(METS_RRDTOOLS_DURATION),
+       (long int)(ganglia_scoreboard_get(METS_RRDTOOLS_DURATION) / APR_TIME_C(1000)), // ms
        (long int)(last_rrdtool / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(METS_SENT_RRDCACHED),
-       ganglia_scoreboard_get(METS_RRDCACHED_DURATION),
+       (long int)(ganglia_scoreboard_get(METS_RRDCACHED_DURATION) / APR_TIME_C(1000)), // ms
        (long int)(last_rrdcached / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(METS_SENT_GRAPHITE),
-       ganglia_scoreboard_get(METS_GRAPHITE_DURATION),
+       (long int)(ganglia_scoreboard_get(METS_GRAPHITE_DURATION) / APR_TIME_C(1000)), // ms
        (long int)(last_graphite / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(METS_SENT_MEMCACHED),
-       ganglia_scoreboard_get(METS_MEMCACHED_DURATION),
+       (long int)(ganglia_scoreboard_get(METS_MEMCACHED_DURATION) / APR_TIME_C(1000)), // ms
        (long int)(last_memcached / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(METS_SENT_RIEMANN),
-       ganglia_scoreboard_get(METS_RIEMANN_DURATION),
+       (long int)(ganglia_scoreboard_get(METS_RIEMANN_DURATION) / APR_TIME_C(1000)), // ms
        (long int)(last_riemann / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(METS_SUMRZ_NUM),
-       ganglia_scoreboard_get(METS_SUMRZ_DURATION),
+       (long int)(ganglia_scoreboard_get(METS_SUMRZ_DURATION) / APR_TIME_C(1000)), // ms
        (long int)(last_metadata / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(NBR_TCP_REQS_ALL),
-       ganglia_scoreboard_get(TIME_TCP_REQS_ALL),
+       (long int)(ganglia_scoreboard_get(TIME_TCP_REQS_ALL) / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(NBR_TCP_REQS_INTXML),
-       ganglia_scoreboard_get(TIME_TCP_REQS_INTXML),
+       (long int)(ganglia_scoreboard_get(TIME_TCP_REQS_INTXML) / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(NBR_TCP_REQS_XML),
-       ganglia_scoreboard_get(TIME_TCP_REQS_XML),
+       (long int)(ganglia_scoreboard_get(TIME_TCP_REQS_XML) / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(DS_POLL_REQS),
-       ganglia_scoreboard_get(DS_POLL_DURATION),
+       (long int)(ganglia_scoreboard_get(DS_POLL_DURATION) / APR_TIME_C(1000)), // ms
        (long int)(last_poll / APR_TIME_C(1000)) // ms
    );
 
