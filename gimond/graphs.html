@@ -9,11 +9,12 @@
 
         <script type="text/javascript">
         
-            var metrics_data;
-            var chart;
-            var interval = 10000;//ms
+            var sent_data, cpu_data;
+            var sent_chart, cpu_chart;
+            var interval;
             var timerId = null;
-            var interval_time = 3600000;//1 hour in ms
+            var timespawn;
+            var tmpsentallvar, tmprrdtoolvar, tmprrdcachedvar, tmpgraphitevar, tmpmemcachedvar, tmpriemannvar;
 
             /* Google charts code */
             
@@ -21,13 +22,16 @@
             google.setOnLoadCallback(setVars);
 
             function setVars(){
-                chart = new google.visualization.LineChart(document.getElementById('metrics_graphs'));
-                metrics_data = [["Date", "All", "Rrdtool", "Rrdcached", "Graphite","Memcached","Riemann"]];
-                getMetrics();
-                timerId = setInterval(getMetrics, interval);
+                sent_chart = new google.visualization.LineChart(document.getElementById('Sent'));
+                cpu_chart = new google.visualization.LineChart(document.getElementById('Cpu'));
+                sent_data = [["Date", "All", "Rrdtool", "Rrdcached", "Graphite","Memcached","Riemann"]];
+                cpu_data = [["Date", "User", "Nice", "System", "Idle"]];
+                tmpsentallvar = [0, 0]; tmprrdtoolvar = [0, 0];
+                tmprrdcachedvar = [0, 0]; tmpgraphitevar = [0, 0];
+                tmpmemcachedvar = [0, 0]; tmpriemannvar = [0, 0];
             }
-            function drawChart(){
-                var last_time = metrics_data[metrics_data.length - 1][0].getTime() - interval_time;
+            function drawChart(name, metrics_data){
+                var last_time = metrics_data[metrics_data.length - 1][0].getTime() - timespawn;
                 var i = 1;
                 //need minimum of 2 points for a line.
                 for(;i<metrics_data.length-1;i++){
@@ -37,18 +41,25 @@
                 }
                     metrics_data.splice(1,i-1);//array is sorted!
                 var options = {
-                    title: 'Example',
+                    title: name,
                     width: 900,
                     height: 120,
-                    hAxis: {viewWindow: {min: metrics_data[1][0], max: new Date(metrics_data[1][0].getTime() + interval_time)}}
+                    hAxis: {viewWindow: {min: metrics_data[1][0], max: new Date(metrics_data[1][0].getTime() + timespawn)}}
                 };
                 var data = google.visualization.arrayToDataTable(metrics_data);
-                chart.draw(data, options);
+                switch (name){
+                    case "Sent":
+                        sent_chart.draw(data, options);
+                    break;
+                    case "Cpu":
+                        cpu_chart.draw(data, options);
+                    break;
+                    default:
+                    break;
+                }
             }
             /* End Google charts code */
-            
-            var tmpallvar = [0, 0], tmprrdtoolvar = [0, 0], tmprrdcachedvar = [0, 0], tmpgraphitevar = [0, 0], tmpmemcachedvar = [0, 0], tmpriemannvar = [0, 0];
-            
+               
             function getMetrics(){
                 var Gmetad = "http://" + window.location.hostname + ":8652/status";
                 $.ajax({
@@ -63,11 +74,12 @@
                     because there was a conflict with another call to ajax(), and sometimes the metrics won't update anymore. */
                 });
             }
-
+            
+            /* Example of a chart with a delta */
             function jsonCallback(data){
-                metrics_data.push([new Date(data["stattime"]/1000),
-                                   ((data["metrics"]["sent"]["all"]["num"] - tmpallvar[0])/
-                                   ((data["metrics"]["sent"]["all"]["totalMillis"] - tmpallvar[1])/interval)),
+                sent_data.push([new Date(data["stattime"]/1000),
+                                   ((data["metrics"]["sent"]["all"]["num"] - tmpsentallvar[0])/
+                                   ((data["metrics"]["sent"]["all"]["totalMillis"] - tmpsentallvar[1])/interval)),
                                    ((data["metrics"]["sent"]["rrdtool"]["num"] - tmprrdtoolvar[0])/
                                    ((data["metrics"]["sent"]["rrdtool"]["totalMillis"] - tmprrdtoolvar[1])/interval)),
                                    ((data["metrics"]["sent"]["rrdcached"]["num"] - tmprrdcachedvar[0])/
@@ -79,27 +91,90 @@
                                    ((data["metrics"]["sent"]["riemann"]["num"] - tmpriemannvar[0])/
                                    ((data["metrics"]["sent"]["riemann"]["totalMillis"] - tmpriemannvar[1])/interval)),
                                  ]);
-                tmpallvar[0] = data["metrics"]["sent"]["all"]["num"];
+                tmpsentallvar[0] = data["metrics"]["sent"]["all"]["num"];
                 tmprrdtoolvar[0] = data["metrics"]["sent"]["rrdtool"]["num"];
                 tmprrdcachedvar[0] = data["metrics"]["sent"]["rrdcached"]["num"];
                 tmpgraphitevar[0] = data["metrics"]["sent"]["graphite"]["num"];
                 tmpmemcachedvar[0] = data["metrics"]["sent"]["memcached"]["num"];
                 tmpriemannvar[0] = data["metrics"]["sent"]["riemann"]["num"];
                 
-                tmpallvar[1] = data["metrics"]["sent"]["all"]["totalMillis"];
+                tmpsentallvar[1] = data["metrics"]["sent"]["all"]["totalMillis"];
                 tmprrdtoolvar[1] = data["metrics"]["sent"]["rrdtool"]["totalMillis"];
                 tmprrdcachedvar[1] = data["metrics"]["sent"]["rrdcached"]["totalMillis"];
                 tmpgraphitevar[1] = data["metrics"]["sent"]["graphite"]["totalMillis"];
                 tmpmemcachedvar[1] = data["metrics"]["sent"]["memcached"]["totalMillis"];
                 tmpriemannvar[1] = data["metrics"]["sent"]["riemann"]["totalMillis"];
 
-                drawChart();
+                drawChart('Sent', sent_data);
+                /* End example */
+                
+                /* Example of a "normal" chart */
+                cpu_data.push([new Date(data["stattime"]/1000),
+                                   data["metrics"]["cpu"]["cpu_user"],
+                                   data["metrics"]["cpu"]["cpu_nice"],
+                                   data["metrics"]["cpu"]["cpu_system"],
+                                   data["metrics"]["cpu"]["cpu_idle"],
+                                 ]);
+                                 
+                drawChart('Cpu', cpu_data);
+                /* End example */
+                
+            }
+            function retrieveDropVal(txt){
+                var e = document.getElementById(txt);
+                return e.options[e.selectedIndex].value;
+            }
+            function updateMetrics(){
+                if(document.getElementById("update").value == "Update"){
+                    interval = retrieveDropVal("interval") * 1000;//sec
+                    timespawn = retrieveDropVal("timespawn") * 60000;//min
+                    document.getElementById("update").value = "Stop";
+                    $('#update').text("Stop");
+                    getMetrics();
+                    timerId = setInterval(getMetrics, interval);
+            
+                }else{
+                    document.getElementById("update").value = "Update";
+                    $('#update').text("Update");
+                    setVars();
+                    clearTimeout(timerId);
+                }
             }
             
         </script>
     </head>
     
     <body>
-    <div id="metrics_graphs" style="height: 120px; width: 900px; "></div>
+    
+    <!-- Graphs -->
+    <div id="Sent" style="height: 120px; width: 900px; "></div>
+    <div id="Cpu" style="height: 120px; width: 900px; "></div>
+    <!--End Graphs -->
+    
+    <div id="buttons">
+        <button type="button" id="update" value="Update" onclick="updateMetrics()">Update</button>
+
+        <label>
+            <select id="interval">
+                <option value=10>10</option>
+                <option value=15>15</option>
+                <option value=30>30</option>
+                <option value=60>60</option>
+            </select>
+            Interval (s)
+        </label>
+
+        <label>
+            <select id="timespawn">
+                <option value=10>10</option>
+                <option value=20>20</option>
+                <option value=30>30</option>
+                <option value=60>60</option>
+                <option value=120>120</option>
+            </select>
+            Timespawn (min)
+        </label>
+    </div>
+    
     </body>
 </html>  
