@@ -89,7 +89,7 @@
                                    ((data["metrics"]["sent"]["memcached"]["num"] - tmpmemcachedvar[0])/
                                    ((data["metrics"]["sent"]["memcached"]["totalMillis"] - tmpmemcachedvar[1])/interval)),
                                    ((data["metrics"]["sent"]["riemann"]["num"] - tmpriemannvar[0])/
-                                   ((data["metrics"]["sent"]["riemann"]["totalMillis"] - tmpriemannvar[1])/interval)),
+                                   ((data["metrics"]["sent"]["riemann"]["totalMillis"] - tmpriemannvar[1])/interval))
                                  ]);
                 tmpsentallvar[0] = data["metrics"]["sent"]["all"]["num"];
                 tmprrdtoolvar[0] = data["metrics"]["sent"]["rrdtool"]["num"];
@@ -113,13 +113,13 @@
                                    data["metrics"]["cpu"]["cpu_user"],
                                    data["metrics"]["cpu"]["cpu_nice"],
                                    data["metrics"]["cpu"]["cpu_system"],
-                                   data["metrics"]["cpu"]["cpu_idle"],
+                                   data["metrics"]["cpu"]["cpu_idle"]
                                  ]);
                                  
                 drawChart('Cpu', cpu_data);
                 /* End example */
-                
             }
+
             function retrieveDropVal(txt){
                 var e = document.getElementById(txt);
                 return e.options[e.selectedIndex].value;
