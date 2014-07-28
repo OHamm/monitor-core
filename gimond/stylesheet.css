@@ -7,5 +7,8 @@
     clear: both;
     position: fixed;
     right: 5px;
-    top: 15px;
+    top: 35px;
+}
+#Last_times {
+    font-family: "Helvetica", "Lucida Sans", "Lucida Sans Unicode", "Luxi Sans", Tahoma, sans-serif;
 }
