@@ -67,6 +67,7 @@
                     title: name,
                     width: 900,
                     height: 120,
+                    legend: {position: 'bottom', alignment: 'start'},
                     hAxis: {viewWindow: {min: metrics_data[1][0], max: new Date(metrics_data[1][0].getTime() + timespawn)}},
                     vAxis: {viewWindow: {min: 0}}
                 };
@@ -272,13 +273,23 @@
             function last_timeCallback(data){
                 var now = $.now();
                 document.getElementById('Last_times').innerHTML =
-                  (data["metrics"]["polls"]["lastTime"]!= 0 ? "Last Poll:" + (now - data["metrics"]["polls"]["lastTime"]) + "ms" : "")
-                +(data["metrics"]["summarize"]["lastTime"]!= 0 ? " Last Summary:" + (now - data["metrics"]["summarize"]["lastTime"]) + "ms" : "")
-                +(data["metrics"]["sent"]["rrdtool"]["lastTime"]!= 0 ? " Last RRD:" + (now - data["metrics"]["sent"]["rrdtool"]["lastTime"]) + "ms" : "")
-                +(data["metrics"]["sent"]["rrdcached"]["lastTime"]!= 0 ? " Last RRDcached:" + (now - data["metrics"]["sent"]["rrdcached"]["lastTime"]) + "ms" : "")
-                +(data["metrics"]["sent"]["graphite"]["lastTime"]!= 0 ? " Last Graphite:" + (now - data["metrics"]["sent"]["graphite"]["lastTime"]) + "ms" : "")
-                +(data["metrics"]["sent"]["memcached"]["lastTime"]!= 0 ? " Last Memcached" + (now - data["metrics"]["sent"]["memcached"]["lastTime"]) + "ms" : "")
-                +(data["metrics"]["sent"]["riemann"]["lastTime"]!= 0 ? " Last Riemann:" + (now - data["metrics"]["sent"]["riemann"]["lastTime"]) + "ms" : "");
+                "<table class='lasts'><tr>"
+                +(data["metrics"]["polls"]["lastTime"]!= 0 ? "<th>Last Poll</th>" : "")
+                +(data["metrics"]["summarize"]["lastTime"]!= 0 ? "<th>Last Summary</th>" : "")
+                +(data["metrics"]["sent"]["rrdtool"]["lastTime"]!= 0 ? "<th>Last RRD</th>" : "")
+                +(data["metrics"]["sent"]["rrdcached"]["lastTime"]!= 0 ? "<th>Last RRDcached</th>" : "")
+                +(data["metrics"]["sent"]["graphite"]["lastTime"]!= 0 ? "<th>Last Graphite</th>" : "")
+                +(data["metrics"]["sent"]["memcached"]["lastTime"]!= 0 ? "<th>Last Memcached</th>" : "")
+                +(data["metrics"]["sent"]["riemann"]["lastTime"]!= 0 ? "<th>Last Riemann</th>" : "")
+                +"</tr><tr>"
+                +(data["metrics"]["polls"]["lastTime"]!= 0 ? "<td>" + ((now - data["metrics"]["polls"]["lastTime"])/1000).toFixed() + "</td>" : "")
+                +(data["metrics"]["summarize"]["lastTime"]!= 0 ? "<td>" + ((now - data["metrics"]["summarize"]["lastTime"])/1000).toFixed() + "</td>" : "")
+                +(data["metrics"]["sent"]["rrdtool"]["lastTime"]!= 0 ? "<td>" + ((now - data["metrics"]["sent"]["rrdtool"]["lastTime"])/1000).toFixed() + "</td>" : "")
+                +(data["metrics"]["sent"]["rrdcached"]["lastTime"]!= 0 ? "<td>" + ((now - data["metrics"]["sent"]["rrdcached"]["lastTime"])/1000).toFixed() + "</td>" : "")
+                +(data["metrics"]["sent"]["graphite"]["lastTime"]!= 0 ? "<td>" + ((now - data["metrics"]["sent"]["graphite"]["lastTime"])/1000).toFixed() + "</td>" : "")
+                +(data["metrics"]["sent"]["memcached"]["lastTime"]!= 0 ? "<td>" + ((now - data["metrics"]["sent"]["memcached"]["lastTime"])/1000).toFixed() + "</td>" : "")
+                +(data["metrics"]["sent"]["riemann"]["lastTime"]!= 0 ? "<td>" + ((now - data["metrics"]["sent"]["riemann"]["lastTime"])/1000).toFixed() + "</td>" : "")
+                +"</tr></table>";
             }
         </script>
     </head>
@@ -289,16 +300,16 @@
     <!--End Last Times -->
     
     <!-- Graphs -->
-    <div id="Sent" style="height: 120px; width: 900px; "></div>
-    <div id="Sent_time" style="height: 120px; width: 900px; "></div>
-    <div id="Polls" style="height: 120px; width: 900px; "></div>
-    <div id="Poll_time" style="height: 120px; width: 900px; "></div>
-    <div id="Received" style="height: 120px; width: 900px; "></div>
-    <div id="Summarized" style="height: 120px; width: 900px; "></div>
-    <div id="Summarized_time" style="height: 120px; width: 900px; "></div>
-    <div id="Requests" style="height: 120px; width: 900px; "></div>
-    <div id="Requests_time" style="height: 120px; width: 900px; "></div>
-    <div id="Cpu" style="height: 120px; width: 900px; "></div>
+    <div id="Sent" style="height: 130px; width: 1000px;"></div>
+    <div id="Sent_time" style="height: 150px; width: 1000px;"></div>
+    <div id="Polls" style="height: 150px; width: 1000px;"></div>
+    <div id="Poll_time" style="height: 150px; width: 1000px;"></div>
+    <div id="Received" style="height: 150px; width: 1000px;"></div>
+    <div id="Summarized" style="height: 150px; width: 1000px;"></div>
+    <div id="Summarized_time" style="height: 150px; width: 1000px;"></div>
+    <div id="Requests" style="height: 150px; width: 1000px;"></div>
+    <div id="Requests_time" style="height: 150px; width: 1000px;"></div>
+    <div id="Cpu" style="height: 150px; width: 1000px;"></div>
     <!--End Graphs -->
     
     <div id="buttons">
