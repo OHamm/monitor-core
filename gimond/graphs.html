@@ -267,38 +267,56 @@
                 getLastTimes();
                 updateMetrics();
             }
-            
+
+            function toSecondsAgo(val){
+                return (($.now() - val)/1000).toFixed(1);
+            }
+
             function last_timeCallback(data){
-                var now = $.now();
-                $("#last_poll").text((data["metrics"]["polls"]["lastTime"]!= 0 ? ((now - data["metrics"]["polls"]["lastTime"])/1000).toFixed() + "s ago" : "n/a"));
-                $("#last_summary").text((data["metrics"]["summarize"]["lastTime"]!= 0 ? ((now - data["metrics"]["summarize"]["lastTime"])/1000).toFixed() + "s ago" : "n/a"));
-                $("#last_rrd").text((data["metrics"]["sent"]["rrdtool"]["lastTime"]!= 0 ? ((now - data["metrics"]["sent"]["rrdtool"]["lastTime"])/1000).toFixed() + "s ago" : "n/a"));
-                $("#last_rrdcached").text((data["metrics"]["sent"]["rrdcached"]["lastTime"]!= 0 ? ((now - data["metrics"]["sent"]["rrdcached"]["lastTime"])/1000).toFixed() + "s ago" : "n/a"));
-                $("#last_graphite").text((data["metrics"]["sent"]["graphite"]["lastTime"]!= 0 ? ((now - data["metrics"]["sent"]["graphite"]["lastTime"])/1000).toFixed() + "s ago" : "n/a"));
-                $("#last_memcached").text((data["metrics"]["sent"]["memcached"]["lastTime"]!= 0 ? ((now - data["metrics"]["sent"]["memcached"]["lastTime"])/1000).toFixed() + "s ago" : "n/a"));
-                $("#last_riemann").text((data["metrics"]["sent"]["riemann"]["lastTime"]!= 0 ? ((now - data["metrics"]["sent"]["riemann"]["lastTime"])/1000).toFixed() + "s ago" : "n/a"));
+                $("#last_poll").text((data["metrics"]["polls"]["lastTime"]!= 0 ? toSecondsAgo(data["metrics"]["polls"]["lastTime"]) + "s ago" : "n/a"));
+                $("#last_summary").text((data["metrics"]["summarize"]["lastTime"]!= 0 ? toSecondsAgo(data["metrics"]["summarize"]["lastTime"]) + "s ago" : "n/a"));
+                $("#last_rrd").text((data["metrics"]["sent"]["rrdtool"]["lastTime"]!= 0 ? toSecondsAgo(data["metrics"]["sent"]["rrdtool"]["lastTime"]) + "s ago" : "n/a"));
+                $("#last_rrdcached").text((data["metrics"]["sent"]["rrdcached"]["lastTime"]!= 0 ? toSecondsAgo(data["metrics"]["sent"]["rrdcached"]["lastTime"]) + "s ago" : "n/a"));
+                $("#last_graphite").text((data["metrics"]["sent"]["graphite"]["lastTime"]!= 0 ? toSecondsAgo(data["metrics"]["sent"]["graphite"]["lastTime"]) + "s ago" : "n/a"));
+                $("#last_memcached").text((data["metrics"]["sent"]["memcached"]["lastTime"]!= 0 ? toSecondsAgo(data["metrics"]["sent"]["memcached"]["lastTime"]) + "s ago" : "n/a"));
+                $("#last_riemann").text((data["metrics"]["sent"]["riemann"]["lastTime"]!= 0 ? toSecondsAgo(data["metrics"]["sent"]["riemann"]["lastTime"]) + "s ago" : "n/a"));
             }
         </script>
     </head>
     
     <body>
+
+    <div id="buttons">
+        <button type="button" id="update" value="Update" onclick="updateMetrics()">Update</button>
+        <label>
+            <select id="timespawn" onchange="changetimespawn()">
+                <option value=10>10</option>
+                <option value=20>20</option>
+                <option value=30>30</option>
+                <option value=60>60</option>
+                <option value=120>120</option>
+            </select>
+            Timespawn (min)
+        </label>
+    </div>
+    
     <!-- Last Times -->
     <table class='lasts'>
         <tr>
-        <td> Last Poll:</td>
-        <td width=70px><span id="last_poll">...</span></td>
-        <td> Last Summary:</td>
-        <td width=70px><span id="last_summary">...</span></td>
-        <td> Last RRD:</td>
-        <td width=70px><span id="last_rrd">...</span></td>
-        <td> Last RRDcached:</td>
-        <td width=70px><span id="last_rrdcached">...</span></td>
-        <td> Last Graphite:</td>
-        <td width=70px><span id="last_graphite">...</span></td>
-        <td> Last Memcached:</td>
-        <td width=70px><span id="last_memcached">...</span></td>
-        <td> Last Riemann:</td>
-        <td width=70px><span id="last_riemann">...</span></td>
+        <td>Last Poll:</td>
+        <td width=80px><span id="last_poll">...</span></td>
+        <td>Summary:</td>
+        <td width=80px><span id="last_summary">...</span></td>
+        <td>RRD:</td>
+        <td width=80px><span id="last_rrd">...</span></td>
+        <td>RRDcached:</td>
+        <td width=80px><span id="last_rrdcached">...</span></td>
+        <td>Graphite:</td>
+        <td width=80px><span id="last_graphite">...</span></td>
+        <td>Memcached:</td>
+        <td width=80px><span id="last_memcached">...</span></td>
+        <td>Riemann:</td>
+        <td width=80px><span id="last_riemann">...</span></td>
         </tr>
     </table>
     <!--End Last Times -->
@@ -315,20 +333,6 @@
     <div id="Requests_time" style="height: 150px; width: 1000px;"></div>
     <div id="Cpu" style="height: 150px; width: 1000px;"></div>
     <!--End Graphs -->
-    
-    <div id="buttons">
-        <button type="button" id="update" value="Update" onclick="updateMetrics()">Update</button>
-        <label>
-            <select id="timespawn" onchange="changetimespawn()">
-                <option value=10>10</option>
-                <option value=20>20</option>
-                <option value=30>30</option>
-                <option value=60>60</option>
-                <option value=120>120</option>
-            </select>
-            Timespawn (min)
-        </label>
-    </div>
     
     </body>
 </html>  

@@ -2,10 +2,10 @@
     border: 1px solid black;
     background: #D0D0D0;
     padding: 2px;
-    float: right;
     display: block;
-    clear: both;
-    position: fixed;
-    right: 5px;
-    top: 50px;
+    width: 300px;
+}
+
+table {
+    font-family: "Helvetica", "Lucida Sans", "Lucida Sans unicode", "Luxi Sans", Arial, sans-serif;
 }
