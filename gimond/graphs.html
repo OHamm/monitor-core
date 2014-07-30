@@ -67,7 +67,7 @@
                     title: name,
                     width: 900,
                     height: 120,
-                    legend: {position: 'bottom', alignment: 'start'},
+                    legend: {position: 'in', alignment: 'start'},
                     hAxis: {viewWindow: {min: metrics_data[1][0], max: new Date(metrics_data[1][0].getTime() + timespawn)}},
                     vAxis: {viewWindow: {min: 0}}
                 };
@@ -140,7 +140,7 @@
             }
             
             function jsonCallback(data){
-                sent_data.push([new Date(data["stattime"]/1000),
+                sent_data.push([new Date(data["stattime"]),
                                     (tmpsentallvar[0] != 0 ? (data["metrics"]["sent"]["all"]["num"] - tmpsentallvar[0]) : 0),
                                     (tmprrdtoolvar[0] != 0 ? (data["metrics"]["sent"]["rrdtool"]["num"] - tmprrdtoolvar[0]) : 0),
                                     (tmprrdcachedvar[0] != 0 ? (data["metrics"]["sent"]["rrdcached"]["num"] - tmprrdcachedvar[0]) : 0),
@@ -150,7 +150,7 @@
                                  ]);
                 drawChart('Sent', sent_data);
 
-                sent_time_data.push([new Date(data["stattime"]/1000),
+                sent_time_data.push([new Date(data["stattime"]),
                                     (tmpsentallvar[1] != 0 ? (data["metrics"]["sent"]["all"]["totalMillis"] - tmpsentallvar[1]) : 0),
                                     (tmprrdtoolvar[1] != 0 ? (data["metrics"]["sent"]["rrdtool"]["totalMillis"] - tmprrdtoolvar[1]) : 0),
                                     (tmprrdcachedvar[1] != 0 ? (data["metrics"]["sent"]["rrdcached"]["totalMillis"] - tmprrdcachedvar[1]) : 0),
@@ -174,12 +174,12 @@
                 tmpmemcachedvar[1] = data["metrics"]["sent"]["memcached"]["totalMillis"];
                 tmpriemannvar[1] = data["metrics"]["sent"]["riemann"]["totalMillis"];
 
-                poll_data.push([new Date(data["stattime"]/1000),
+                poll_data.push([new Date(data["stattime"]),
                                     (tmppollvar[0] != 0 ? (data["metrics"]["polls"]["num"] - tmppollvar[0]) : 0)
                                  ]);
                 drawChart('Polls', poll_data);
                 
-                poll_time_data.push([new Date(data["stattime"]/1000),
+                poll_time_data.push([new Date(data["stattime"]),
                                     (tmppollvar[1] != 0 ? (data["metrics"]["polls"]["totalMillis"] - tmppollvar[1]) : 0)
                                  ]);
                 drawChart('Poll_time', poll_time_data);
@@ -187,18 +187,18 @@
                 tmppollvar[0] = data["metrics"]["polls"]["num"];
                 tmppollvar[1] = data["metrics"]["polls"]["totalMillis"];
 
-                recv_data.push([new Date(data["stattime"]/1000),
+                recv_data.push([new Date(data["stattime"]),
                                    (tmprecvvar != 0 ? (data["metrics"]["received"]["all"] - tmprecvvar) : 0)
                                  ]);
                 tmprecvvar = data["metrics"]["received"]["all"];
                 drawChart('Received', recv_data);
 
-                sumrz_data.push([new Date(data["stattime"]/1000),
+                sumrz_data.push([new Date(data["stattime"]),
                                     (tmpsumrzvar[0] != 0 ? (data["metrics"]["summarize"]["num"] - tmpsumrzvar[0]) : 0)
                                  ]);
                 drawChart('Summarized', sumrz_data);
 
-                sumrz_time_data.push([new Date(data["stattime"]/1000),
+                sumrz_time_data.push([new Date(data["stattime"]),
                                     (tmpsumrzvar[1] != 0 ? (data["metrics"]["summarize"]["totalMillis"] - tmpsumrzvar[1]) : 0)
                                  ]);
                 drawChart('Summarize_time', sumrz_time_data);
@@ -206,14 +206,14 @@
                 tmpsumrzvar[0] = data["metrics"]["summarize"]["num"];
                 tmpsumrzvar[1] = data["metrics"]["summarize"]["totalMillis"];
 
-                req_data.push([new Date(data["stattime"]/1000),
+                req_data.push([new Date(data["stattime"]),
                                     (tmpreqallvar[0] != 0 ? (data["metrics"]["requests"]["all"]["num"] - tmpreqallvar[0]) : 0),
                                     (tmpinteractivevar[0] != 0 ? (data["metrics"]["requests"]["interactive"]["num"] - tmpinteractivevar[0]) : 0),
                                     (tmpxmlvar[0] != 0 ? (data["metrics"]["requests"]["xml"]["num"] - tmpxmlvar[0]) : 0)
                                  ]);
                 drawChart('Requests', req_data);
 
-                req_time_data.push([new Date(data["stattime"]/1000),
+                req_time_data.push([new Date(data["stattime"]),
                                     (tmpreqallvar[1] != 0 ? (data["metrics"]["requests"]["all"]["totalMillis"] - tmpreqallvar[1]) : 0),
                                     (tmpinteractivevar[1] != 0 ? (data["metrics"]["requests"]["interactive"]["totalMillis"] - tmpinteractivevar[1]) : 0),
                                     (tmpxmlvar[1] != 0 ? (data["metrics"]["requests"]["xml"]["totalMillis"] - tmpxmlvar[1]) : 0)
@@ -227,7 +227,7 @@
                 tmpxmlvar[0] = data["metrics"]["requests"]["xml"]["num"];
                 tmpxmlvar[1] = data["metrics"]["requests"]["xml"]["totalMillis"];
 
-                cpu_data.push([new Date(data["stattime"]/1000),
+                cpu_data.push([new Date(data["stattime"]),
                                    data["metrics"]["cpu"]["cpu_user"],
                                    data["metrics"]["cpu"]["cpu_nice"],
                                    data["metrics"]["cpu"]["cpu_system"],
@@ -270,13 +270,13 @@
             
             function last_timeCallback(data){
                 var now = $.now();
-                $("#last_poll").text((data["metrics"]["polls"]["lastTime"]!= 0 ? ((now - data["metrics"]["polls"]["lastTime"])/1000).toFixed() : "..."));
-                $("#last_summary").text((data["metrics"]["summarize"]["lastTime"]!= 0 ? ((now - data["metrics"]["summarize"]["lastTime"])/1000).toFixed() : "..."));
-                $("#last_rrd").text((data["metrics"]["sent"]["rrdtool"]["lastTime"]!= 0 ? ((now - data["metrics"]["sent"]["rrdtool"]["lastTime"])/1000).toFixed() : "..."));
-                $("#last_rrdcached").text((data["metrics"]["sent"]["rrdcached"]["lastTime"]!= 0 ? ((now - data["metrics"]["sent"]["rrdcached"]["lastTime"])/1000).toFixed() : "..."));
-                $("#last_graphite").text((data["metrics"]["sent"]["graphite"]["lastTime"]!= 0 ? ((now - data["metrics"]["sent"]["graphite"]["lastTime"])/1000).toFixed() : "..."));
-                $("#last_memcached").text((data["metrics"]["sent"]["memcached"]["lastTime"]!= 0 ? ((now - data["metrics"]["sent"]["memcached"]["lastTime"])/1000).toFixed() : "..."));
-                $("#last_riemann").text((data["metrics"]["sent"]["riemann"]["lastTime"]!= 0 ? ((now - data["metrics"]["sent"]["riemann"]["lastTime"])/1000).toFixed() : "..."));
+                $("#last_poll").text((data["metrics"]["polls"]["lastTime"]!= 0 ? ((now - data["metrics"]["polls"]["lastTime"])/1000).toFixed() + "s ago" : "n/a"));
+                $("#last_summary").text((data["metrics"]["summarize"]["lastTime"]!= 0 ? ((now - data["metrics"]["summarize"]["lastTime"])/1000).toFixed() + "s ago" : "n/a"));
+                $("#last_rrd").text((data["metrics"]["sent"]["rrdtool"]["lastTime"]!= 0 ? ((now - data["metrics"]["sent"]["rrdtool"]["lastTime"])/1000).toFixed() + "s ago" : "n/a"));
+                $("#last_rrdcached").text((data["metrics"]["sent"]["rrdcached"]["lastTime"]!= 0 ? ((now - data["metrics"]["sent"]["rrdcached"]["lastTime"])/1000).toFixed() + "s ago" : "n/a"));
+                $("#last_graphite").text((data["metrics"]["sent"]["graphite"]["lastTime"]!= 0 ? ((now - data["metrics"]["sent"]["graphite"]["lastTime"])/1000).toFixed() + "s ago" : "n/a"));
+                $("#last_memcached").text((data["metrics"]["sent"]["memcached"]["lastTime"]!= 0 ? ((now - data["metrics"]["sent"]["memcached"]["lastTime"])/1000).toFixed() + "s ago" : "n/a"));
+                $("#last_riemann").text((data["metrics"]["sent"]["riemann"]["lastTime"]!= 0 ? ((now - data["metrics"]["sent"]["riemann"]["lastTime"])/1000).toFixed() + "s ago" : "n/a"));
             }
         </script>
     </head>
@@ -286,19 +286,19 @@
     <table class='lasts'>
         <tr>
         <td> Last Poll:</td>
-        <td width=20px><span id="last_poll">...</span></td>
+        <td width=70px><span id="last_poll">...</span></td>
         <td> Last Summary:</td>
-        <td width=20px><span id="last_summary">...</span></td>
+        <td width=70px><span id="last_summary">...</span></td>
         <td> Last RRD:</td>
-        <td width=20px><span id="last_rrd">...</span></td>
+        <td width=70px><span id="last_rrd">...</span></td>
         <td> Last RRDcached:</td>
-        <td width=20px><span id="last_rrdcached">...</span></td>
+        <td width=70px><span id="last_rrdcached">...</span></td>
         <td> Last Graphite:</td>
-        <td width=20px><span id="last_graphite">...</span></td>
+        <td width=70px><span id="last_graphite">...</span></td>
         <td> Last Memcached:</td>
-        <td width=20px><span id="last_memcached">...</span></td>
+        <td width=70px><span id="last_memcached">...</span></td>
         <td> Last Riemann:</td>
-        <td width=20px><span id="last_riemann">...</span></td>
+        <td width=70px><span id="last_riemann">...</span></td>
         </tr>
     </table>
     <!--End Last Times -->

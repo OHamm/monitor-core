@@ -9,16 +9,3 @@
     right: 5px;
     top: 50px;
 }
-
-#Last_times {
-    font-family: "Helvetica", "Lucida Sans", "Lucida Sans Unicode", "Luxi Sans", Tahoma, sans-serif;
-}
-
-table {
-    font-family: "Helvetica", "Lucida Sans", "Lucida Sans Unicode", "Luxi Sans", Tahoma, sans-serif;
-}
-
-table, td, th {
-    padding: 5px;
-    text-align: center;
-}
