@@ -20,7 +20,7 @@ extern hash_t *root;
 
 extern int process_xml(data_source_list_t *, char *);
 
-apr_time_t last_poll;
+apr_time_t last_poll_all, last_poll_ok, last_poll_failed;
 
 void *
 data_thread ( void *arg )
@@ -86,7 +86,8 @@ data_thread ( void *arg )
                      break;
                    }
                  else
-                   {
+                 {
+                     ganglia_scoreboard_inc(DS_POLL_FAILED_REQS);
                      err_msg("data_thread() for [%s] failed to contact node %s", d->name, d->sources[i]->name);
                    }
                }
@@ -105,13 +106,13 @@ data_thread ( void *arg )
          read_index = 0;
          for(;;)
             {
-               ganglia_scoreboard_inc(DS_POLL_REQS);
+               ganglia_scoreboard_inc(DS_POLL_ALL_REQS);
                now = apr_time_now();
                /* Timeout set to 10 seconds */
                rval = poll( &struct_poll, 1, 10000);
                after_poll = apr_time_now();
-               ganglia_scoreboard_incby(DS_POLL_DURATION, after_poll - now);
-               last_poll = after_poll;
+               ganglia_scoreboard_incby(DS_POLL_ALL_DURATION, after_poll - now);
+               last_poll_all = after_poll;
                
                if( rval < 0 )
                   {
@@ -159,6 +160,7 @@ data_thread ( void *arg )
                            bytes_read = read(sock->sockfd, buf+read_index, read_available);
                            if (bytes_read < 0)
                               {
+                                  last_poll_failed = after_poll;
                                  err_msg("data_thread() unable to read() socket for [%s] data source", d->name);
                                  d->last_good_index = -1;
                                  d->dead = 1;
@@ -198,6 +200,9 @@ data_thread ( void *arg )
                         }
                   }
             }
+            ganglia_scoreboard_inc(DS_POLL_OK_REQS);
+            ganglia_scoreboard_incby(DS_POLL_OK_DURATION, after_poll - start);
+            last_poll_ok = after_poll;
 
          /* These are the gzip header magic numbers, per RFC 1952 section 2.3.1 */
          if(read_index > 2 && (unsigned char)buf[0] == 0x1f && (unsigned char)buf[1] == 0x8b)

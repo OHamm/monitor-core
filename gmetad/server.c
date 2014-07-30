@@ -161,7 +161,7 @@ extern gmetad_config_t gmetad_config;
 extern char* getfield(char *buf, short int index);
 extern struct type_tag* in_type_list (char *, unsigned int);
 
-extern apr_time_t started, last_poll, last_rrdtool, last_rrdcached, last_memcached, last_graphite, last_riemann, last_metadata;
+extern apr_time_t started, last_poll_all, last_poll_ok, last_poll_failed, last_rrdtool, last_rrdcached, last_memcached, last_graphite, last_riemann, last_metadata;
 
 extern char hostname[HOSTNAMESZ];
 
@@ -736,9 +736,21 @@ status_report( client_t *client , char *callback)
        "}"
        "},"
        "\"polls\":{"
+       "\"all\":{"
        "\"num\":%u,"
        "\"totalMillis\":%lu,"
        "\"lastTime\":%lu"
+       "},"
+       "\"ok\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%lu,"
+       "\"lastTime\":%lu"
+       "},"
+       "\"failed\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%lu,"
+       "\"lastTime\":%lu"
+       "},"
        "},"
        ,
        callback != NULL ? callback : "",
@@ -777,9 +789,15 @@ status_report( client_t *client , char *callback)
        (long int)(ganglia_scoreboard_get(TIME_TCP_REQS_INTXML) / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(NBR_TCP_REQS_XML),
        (long int)(ganglia_scoreboard_get(TIME_TCP_REQS_XML) / APR_TIME_C(1000)), // ms
-       ganglia_scoreboard_get(DS_POLL_REQS),
-       (long int)(ganglia_scoreboard_get(DS_POLL_DURATION) / APR_TIME_C(1000)), // ms
-       (long int)(last_poll / APR_TIME_C(1000)) // ms
+       ganglia_scoreboard_get(DS_POLL_ALL_REQS),
+       (long int)(ganglia_scoreboard_get(DS_POLL_ALL_DURATION) / APR_TIME_C(1000)), // ms
+       (long int)(last_poll_all / APR_TIME_C(1000)), // ms
+       ganglia_scoreboard_get(DS_POLL_OK_REQS),
+       (long int)(ganglia_scoreboard_get(DS_POLL_OK_DURATION) / APR_TIME_C(1000)), // ms
+       (long int)(last_poll_ok / APR_TIME_C(1000)), // ms
+       ganglia_scoreboard_get(DS_POLL_FAILED_REQS),
+       (long int)(ganglia_scoreboard_get(DS_POLL_FAILED_DURATION) / APR_TIME_C(1000)), // ms
+       (long int)(last_poll_failed / APR_TIME_C(1000)) // ms
    );
 
    /* Get local metrics */

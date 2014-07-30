@@ -29,8 +29,12 @@ typedef enum ganglia_scoreboard_types ganglia_scoreboard_types;
 #define METS_MEMCACHED_DURATION "mets_memcached_duration"
 #define METS_RIEMANN_DURATION "mets_riemann_duration"
 
-#define DS_POLL_REQS "ds_poll_reqs"
-#define DS_POLL_DURATION "ds_poll_duration"
+#define DS_POLL_ALL_REQS "ds_poll_all_reqs"
+#define DS_POLL_ALL_DURATION "ds_poll_all_duration"
+#define DS_POLL_OK_REQS "ds_poll_ok_reqs"
+#define DS_POLL_OK_DURATION "ds_poll_ok_duration"
+#define DS_POLL_FAILED_REQS "ds_poll_failed_reqs"
+#define DS_POLL_FAILED_DURATION "ds_poll_failed_duration"
 
 #define NBR_TCP_REQS_ALL "nbr_tcp_reqs_all"
 #define TIME_TCP_REQS_ALL "time_tcp_reqs_all"
