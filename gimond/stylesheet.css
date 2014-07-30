@@ -7,7 +7,7 @@
     clear: both;
     position: fixed;
     right: 5px;
-    top: 35px;
+    top: 50px;
 }
 
 #Last_times {
@@ -16,13 +16,9 @@
 
 table {
     font-family: "Helvetica", "Lucida Sans", "Lucida Sans Unicode", "Luxi Sans", Tahoma, sans-serif;
-    box-shadow: 1px 1px 10px rgba(0,0,0,0.5);
-    border-collapse: collapse;
-    border-spacing: 0;
 }
 
 table, td, th {
     padding: 5px;
     text-align: center;
-    border: 1px solid black;
 }
