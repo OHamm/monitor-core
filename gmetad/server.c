@@ -717,7 +717,6 @@ status_report( client_t *client , char *callback)
        "}"
        "},"
        "\"summarize\":{"
-       "\"grid\":%u,"
        "\"cluster\":%u,"
        "\"root\":%u,"
        "\"totalMillis\":%lu,"
@@ -738,11 +737,6 @@ status_report( client_t *client , char *callback)
        "}"
        "},"
        "\"polls\":{"
-       "\"all\":{"
-       "\"num\":%u,"
-       "\"totalMillis\":%lu,"
-       "\"lastTime\":%lu"
-       "},"
        "\"ok\":{"
        "\"num\":%u,"
        "\"totalMillis\":%lu,"
@@ -783,7 +777,6 @@ status_report( client_t *client , char *callback)
        ganglia_scoreboard_get(METS_SENT_RIEMANN),
        (long int)(ganglia_scoreboard_get(METS_RIEMANN_DURATION) / APR_TIME_C(1000)), // ms
        (long int)(last_riemann / APR_TIME_C(1000)), // ms
-       ganglia_scoreboard_get(METS_SUMRZ_GRID),
        ganglia_scoreboard_get(METS_SUMRZ_CLUSTER),
        ganglia_scoreboard_get(METS_SUMRZ_ROOT),
        (long int)(ganglia_scoreboard_get(METS_SUMRZ_DURATION) / APR_TIME_C(1000)), // ms
@@ -794,9 +787,6 @@ status_report( client_t *client , char *callback)
        (long int)(ganglia_scoreboard_get(TIME_TCP_REQS_INTXML) / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(NBR_TCP_REQS_XML),
        (long int)(ganglia_scoreboard_get(TIME_TCP_REQS_XML) / APR_TIME_C(1000)), // ms
-       ganglia_scoreboard_get(DS_POLL_ALL_REQS),
-       (long int)(ganglia_scoreboard_get(DS_POLL_ALL_DURATION) / APR_TIME_C(1000)), // ms
-       (long int)(last_poll_all / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(DS_POLL_OK_REQS),
        (long int)(ganglia_scoreboard_get(DS_POLL_OK_DURATION) / APR_TIME_C(1000)), // ms
        (long int)(last_poll_ok / APR_TIME_C(1000)), // ms

@@ -266,9 +266,7 @@ out:
 void initialize_scoreboard()
 {
     ganglia_scoreboard_init(global_context);
-    
-    ganglia_scoreboard_add(DS_POLL_ALL_REQS, GSB_COUNTER);
-    ganglia_scoreboard_add(DS_POLL_ALL_DURATION, GSB_COUNTER);
+
     ganglia_scoreboard_add(DS_POLL_OK_REQS, GSB_COUNTER);
     ganglia_scoreboard_add(DS_POLL_OK_DURATION, GSB_COUNTER);
     ganglia_scoreboard_add(DS_POLL_FAILED_REQS, GSB_COUNTER);
@@ -292,7 +290,6 @@ void initialize_scoreboard()
     
     ganglia_scoreboard_add(METS_SUMRZ_ROOT, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SUMRZ_CLUSTER, GSB_COUNTER);
-    ganglia_scoreboard_add(METS_SUMRZ_GRID, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SUMRZ_DURATION, GSB_COUNTER);
     
     ganglia_scoreboard_add(NBR_TCP_REQS_ALL, GSB_COUNTER);

@@ -19,7 +19,7 @@
             var timespawn;
             var tmpsentallvar, tmprrdtoolvar, tmprrdcachedvar, tmpgraphitevar, tmpmemcachedvar, tmpriemannvar;
             var tmppollokvar, tmppollfailvar, tmpsumrzvar, tmpreqallvar, tmpinteractivevar, tmpxmlvar;
-            var tmprecvvar, tmpsumrzgridvar, tmpsumrzclustvar, tmpsumrzrootvar, tmppollmissvar;
+            var tmprecvvar, tmpsumrzclustvar, tmpsumrzrootvar, tmppollmissvar;
 
             /* Google charts code */
             google.load("visualization", "1", {packages:["corechart"]});
@@ -44,7 +44,7 @@
                 poll_data = [["Date", "Ok", "Failed", "Misses"]];
                 poll_time_data = [["Date", "Ok", "Failed"]];
                 recv_data = [["Date", "Metrics/min"]];
-                sumrz_data = [["Date", "Grid", "Cluster", "Root"]];
+                sumrz_data = [["Date", "Cluster", "Root"]];
                 sumrz_time_data = [["Date", "Time"]];
                 req_data = [["Date", "All", "Interactive", "xml"]];
                 req_time_data = [["Date", "All", "Interactive", "xml"]];
@@ -52,7 +52,7 @@
                 tmprrdcachedvar = [0, 0]; tmpgraphitevar = [0, 0];
                 tmpmemcachedvar = [0, 0]; tmpriemannvar = [0, 0];
                 tmppollokvar = [0, 0]; tmppollfailvar = [0, 0];
-                tmprecvvar = 0; tmpsumrzgridvar = 0;
+                tmprecvvar = 0;
                 tmpsumrzclustvar = 0; tmpsumrzrootvar = 0;
                 tmpsumrzvar = 0; tmpreqallvar = [0, 0];
                 tmpinteractivevar = [0, 0]; tmpxmlvar = [0, 0];
@@ -207,7 +207,6 @@
                 drawChart('Received', recv_data);
 
                 sumrz_data.push([new Date(data["stattime"]),
-                                    (tmpsumrzgridvar != 0 ? (data["metrics"]["summarize"]["grid"] - tmpsumrzgridvar) : 0),
                                     (tmpsumrzclustvar != 0 ? (data["metrics"]["summarize"]["cluster"] - tmpsumrzclustvar) : 0),
                                     (tmpsumrzrootvar != 0 ? (data["metrics"]["summarize"]["root"] - tmpsumrzrootvar) : 0)
                                  ]);
@@ -218,7 +217,6 @@
                                  ]);
                 drawChart('Summarize time', sumrz_time_data);
 
-                tmpsumrzgridvar = data["metrics"]["summarize"]["grid"];
                 tmpsumrzclustvar = data["metrics"]["summarize"]["cluster"];
                 tmpsumrzrootvar = data["metrics"]["summarize"]["root"];
                 tmpsumrzvar = data["metrics"]["summarize"]["totalMillis"];
@@ -290,7 +288,8 @@
             }
 
             function last_timeCallback(data){
-                $("#last_poll").text((data["metrics"]["polls"]["ok"]["lastTime"]!= 0 ? toSecondsAgo(data["metrics"]["polls"]["ok"]["lastTime"]) + "s" : "n/a"));
+                $("#last_poll_ok").text((data["metrics"]["polls"]["ok"]["lastTime"]!= 0 ? toSecondsAgo(data["metrics"]["polls"]["ok"]["lastTime"]) + "s" : "n/a"));
+                $("#last_poll_fail").text((data["metrics"]["polls"]["failed"]["lastTime"]!= 0 ? toSecondsAgo(data["metrics"]["polls"]["failed"]["lastTime"]) + "s" : "n/a"));
                 $("#last_summary").text((data["metrics"]["summarize"]["lastTime"]!= 0 ? toSecondsAgo(data["metrics"]["summarize"]["lastTime"]) + "s" : "n/a"));
                 $("#last_rrd").text((data["metrics"]["sent"]["rrdtool"]["lastTime"]!= 0 ? toSecondsAgo(data["metrics"]["sent"]["rrdtool"]["lastTime"]) + "s" : "n/a"));
                 $("#last_rrdcached").text((data["metrics"]["sent"]["rrdcached"]["lastTime"]!= 0 ? toSecondsAgo(data["metrics"]["sent"]["rrdcached"]["lastTime"]) + "s" : "n/a"));
@@ -319,8 +318,10 @@
         <!-- Last Times -->
         <table class='lasts'>
             <tr>
-            <td>Last Poll:</td>
-            <td width=50px><span id="last_poll">...</span></td>
+            <td>Last Poll Ok:</td>
+            <td width=50px><span id="last_poll_ok">...</span></td>
+            <td>Poll Failed:</td>
+            <td width=50px><span id="last_poll_fail">...</span></td>
             <td>Summary:</td>
             <td width=50px><span id="last_summary">...</span></td>
             <td>RRD:</td>
