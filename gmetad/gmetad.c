@@ -602,7 +602,6 @@ main ( int argc, char *argv[] )
    last_metadata = apr_time_now();
    for(;;)
    {
-         ganglia_scoreboard_inc(METS_SUMRZ_GRID);
          /* Do at a random interval, between 
                  (shortest_step/2) +/- METADATA_SLEEP_RANDOMIZE percent */
          random_sleep_factor = (1 + (METADATA_SLEEP_RANDOMIZE / 50.0) * ((rand_r(&rand_seed) - RAND_MAX/2)/(float)RAND_MAX));
