@@ -764,7 +764,6 @@ startElement_METRIC(void *data, const char *el, const char **attr)
    /* Always update summary for numeric metrics. */
    if (do_summary)
       {
-         ganglia_scoreboard_inc(METS_SUMRZ_NUM);
          summary = xmldata->source.metric_summary_pending;
          hash_datum = hash_lookup(&hashkey, summary);
          if (!hash_datum)
@@ -1197,6 +1196,7 @@ finish_processing_source(datum_t *key, datum_t *val, void *arg)
        debug_msg("Writing Summary data for source %s, metric %s",
                  xmldata->sourcename, name);
        
+       ganglia_scoreboard_inc(METS_SUMRZ_NUM);
        xmldata->rval = write_data_to_rrd(xmldata->sourcename, NULL, name,
                                          sum, num, xmldata->ds->step,
                                          xmldata->source.localtime,
