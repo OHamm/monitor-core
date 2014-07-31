@@ -19,9 +19,12 @@
 
 #define HOSTNAMESZ 64
 
-/* Local metrics */
+/*
+ * These metrics are identical to gmond's metrics. (gmond -m)
+ * If new metrics are added to gmond they can be added here.
+ * 
+ */
 #include "libmetrics.h"
-
 static const struct metricinfo
 {
   const char *name;
@@ -158,7 +161,7 @@ extern gmetad_config_t gmetad_config;
 extern char* getfield(char *buf, short int index);
 extern struct type_tag* in_type_list (char *, unsigned int);
 
-extern apr_time_t started, last_poll, last_rrdtool, last_rrdcached, last_memcached, last_graphite, last_riemann, last_metadata;
+extern apr_time_t started, last_poll_all, last_poll_ok, last_poll_failed, last_rrdtool, last_rrdcached, last_memcached, last_graphite, last_riemann, last_metadata;
 
 extern char hostname[HOSTNAMESZ];
 
@@ -685,57 +688,66 @@ status_report( client_t *client , char *callback)
        "\"sent\":{"
        "\"all\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u"
+       "\"totalMillis\":%lu"
        "},"
        "\"rrdtool\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u,"
+       "\"totalMillis\":%lu,"
        "\"lastTime\":%lu"
        "},"
        "\"rrdcached\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u,"
+       "\"totalMillis\":%lu,"
        "\"lastTime\":%lu"
        "},"
        "\"graphite\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u,"
+       "\"totalMillis\":%lu,"
        "\"lastTime\":%lu"
        "},"
        "\"memcached\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u,"
+       "\"totalMillis\":%lu,"
        "\"lastTime\":%lu"
        "},"
        "\"riemann\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u,"
+       "\"totalMillis\":%lu,"
        "\"lastTime\":%lu"
        "}"
        "},"
        "\"summarize\":{"
-       "\"num\":%u,"
-       "\"totalMillis\":%u,"
+       "\"cluster\":%u,"
+       "\"root\":%u,"
+       "\"totalMillis\":%lu,"
        "\"lastTime\":%lu"
        "},"
        "\"requests\":{"
        "\"all\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u"
+       "\"totalMillis\":%lu"
        "},"
        "\"interactive\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u"
+       "\"totalMillis\":%lu"
        "},"
        "\"xml\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u"
+       "\"totalMillis\":%lu"
        "}"
        "},"
        "\"polls\":{"
+       "\"ok\":{"
        "\"num\":%u,"
-       "\"totalMillis\":%u,"
+       "\"totalMillis\":%lu,"
        "\"lastTime\":%lu"
+       "},"
+       "\"failed\":{"
+       "\"num\":%u,"
+       "\"totalMillis\":%lu,"
+       "\"lastTime\":%lu"
+       "},"
+       "\"misses\":%u"
        "},"
        ,
        callback != NULL ? callback : "",
@@ -743,48 +755,53 @@ status_report( client_t *client , char *callback)
        hostname,
        gmetad_config.gridname,
        GANGLIA_VERSION_FULL,
-       now, // microseconds
+       (long int)(now / APR_TIME_C(1000)), // ms
        (long int)(started / APR_TIME_C(1000)), // ms
        (long int)((now - started) / APR_USEC_PER_SEC), // seconds
        (long int)((now - started) / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(METS_RECVD_ALL),
        ganglia_scoreboard_get(METS_SENT_ALL),
-       ganglia_scoreboard_get(METS_ALL_DURATION),
+       (long int)(ganglia_scoreboard_get(METS_ALL_DURATION) / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(METS_SENT_RRDTOOL),
-       ganglia_scoreboard_get(METS_RRDTOOLS_DURATION),
+       (long int)(ganglia_scoreboard_get(METS_RRDTOOLS_DURATION) / APR_TIME_C(1000)), // ms
        (long int)(last_rrdtool / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(METS_SENT_RRDCACHED),
-       ganglia_scoreboard_get(METS_RRDCACHED_DURATION),
+       (long int)(ganglia_scoreboard_get(METS_RRDCACHED_DURATION) / APR_TIME_C(1000)), // ms
        (long int)(last_rrdcached / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(METS_SENT_GRAPHITE),
-       ganglia_scoreboard_get(METS_GRAPHITE_DURATION),
+       (long int)(ganglia_scoreboard_get(METS_GRAPHITE_DURATION) / APR_TIME_C(1000)), // ms
        (long int)(last_graphite / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(METS_SENT_MEMCACHED),
-       ganglia_scoreboard_get(METS_MEMCACHED_DURATION),
+       (long int)(ganglia_scoreboard_get(METS_MEMCACHED_DURATION) / APR_TIME_C(1000)), // ms
        (long int)(last_memcached / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(METS_SENT_RIEMANN),
-       ganglia_scoreboard_get(METS_RIEMANN_DURATION),
+       (long int)(ganglia_scoreboard_get(METS_RIEMANN_DURATION) / APR_TIME_C(1000)), // ms
        (long int)(last_riemann / APR_TIME_C(1000)), // ms
-       ganglia_scoreboard_get(METS_SUMRZ_NUM),
-       ganglia_scoreboard_get(METS_SUMRZ_DURATION),
+       ganglia_scoreboard_get(METS_SUMRZ_CLUSTER),
+       ganglia_scoreboard_get(METS_SUMRZ_ROOT),
+       (long int)(ganglia_scoreboard_get(METS_SUMRZ_DURATION) / APR_TIME_C(1000)), // ms
        (long int)(last_metadata / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(NBR_TCP_REQS_ALL),
-       ganglia_scoreboard_get(TIME_TCP_REQS_ALL),
+       (long int)(ganglia_scoreboard_get(TIME_TCP_REQS_ALL) / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(NBR_TCP_REQS_INTXML),
-       ganglia_scoreboard_get(TIME_TCP_REQS_INTXML),
+       (long int)(ganglia_scoreboard_get(TIME_TCP_REQS_INTXML) / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(NBR_TCP_REQS_XML),
-       ganglia_scoreboard_get(TIME_TCP_REQS_XML),
-       ganglia_scoreboard_get(DS_POLL_REQS),
-       ganglia_scoreboard_get(DS_POLL_DURATION),
-       (long int)(last_poll / APR_TIME_C(1000)) // ms
+       (long int)(ganglia_scoreboard_get(TIME_TCP_REQS_XML) / APR_TIME_C(1000)), // ms
+       ganglia_scoreboard_get(DS_POLL_OK_REQS),
+       (long int)(ganglia_scoreboard_get(DS_POLL_OK_DURATION) / APR_TIME_C(1000)), // ms
+       (long int)(last_poll_ok / APR_TIME_C(1000)), // ms
+       ganglia_scoreboard_get(DS_POLL_FAILED_REQS),
+       (long int)(ganglia_scoreboard_get(DS_POLL_FAILED_DURATION) / APR_TIME_C(1000)), // ms
+       (long int)(last_poll_failed / APR_TIME_C(1000)), // ms
+       ganglia_scoreboard_get(DS_POLL_MISS)
    );
 
    /* Get local metrics */
    metric_init();
    /*
     * If buffers get too small because new metrics are added, just up the size
-    * of METRICSBUFSIZE,
-    * the extra space will be cut when the buffer is inserted in the JSON.
+    * of METRICSBUFSIZE, the extra space will be cut when the buffer is inserted
+    * in the JSON.
     */
    char coreBuf[METRICSBUFSIZE], cpuBuf[METRICSBUFSIZE], diskBuf[METRICSBUFSIZE],
    loadBuf[METRICSBUFSIZE], memoryBuf[METRICSBUFSIZE], networkBuf[METRICSBUFSIZE],
@@ -819,7 +836,8 @@ status_report( client_t *client , char *callback)
          coreOffset += snprintf (coreBuf + coreOffset, METRICSBUFSIZE > coreOffset ? METRICSBUFSIZE - coreOffset : 0, "\"%s\":\"%\",", metrics[i].name, );
       }
       */
-      else if(strcmp(metrics[i].name, "cpu_steal") == 0){
+      else if(strcmp(metrics[i].name, "cpu_steal") == 0 ||
+              strcmp(metrics[i].name, "cpu_num") == 0){
          cpuOffset += snprintf (cpuBuf + cpuOffset, METRICSBUFSIZE > cpuOffset ? METRICSBUFSIZE - cpuOffset : 0, "\"%s\":%d,", metrics[i].name, (unsigned int) val.uint16);
       }else if(strcmp(metrics[i].name, "cpu_intr") == 0 ||
                strcmp(metrics[i].name, "cpu_sintr") == 0 ||
@@ -830,8 +848,6 @@ status_report( client_t *client , char *callback)
                strcmp(metrics[i].name, "cpu_system") == 0 ||
                strcmp(metrics[i].name, "cpu_wio") == 0){
          cpuOffset += snprintf (cpuBuf + cpuOffset, METRICSBUFSIZE > cpuOffset ? METRICSBUFSIZE - cpuOffset : 0, "\"%s\":%f,", metrics[i].name, val.f);
-      }else if(strcmp(metrics[i].name, "cpu_num") == 0){
-         cpuOffset += snprintf (cpuBuf + cpuOffset, METRICSBUFSIZE > cpuOffset ? METRICSBUFSIZE - cpuOffset : 0, "\"%s\":%d,", metrics[i].name, (unsigned int) val.uint16);
       }else if(strcmp(metrics[i].name, "cpu_speed") == 0){
          cpuOffset += snprintf (cpuBuf + cpuOffset, METRICSBUFSIZE > cpuOffset ? METRICSBUFSIZE - cpuOffset : 0, "\"%s\":%u,", metrics[i].name, (unsigned int) val.uint32);
       }else if(strcmp(metrics[i].name, "disk_free") == 0 ||
@@ -898,7 +914,8 @@ status_report( client_t *client , char *callback)
 #endif
     /*
      * If new metrics are added but are not sorted in the buffers,
-     * they'll show up here and will be added to the "otherBuf" buffer.
+     * they'll show up here and will be added to the "otherBuf" buffer,
+     * and they'll be in the "other" nest.
      */
       else{
          switch (metrics[i].type){
@@ -946,7 +963,12 @@ status_report( client_t *client , char *callback)
    systemOffset += snprintf (systemBuf + (systemOffset - 1), METRICSBUFSIZE > systemOffset ? METRICSBUFSIZE - systemOffset : 0, "},") - 1;
    otherOffset += snprintf (otherBuf + (otherOffset - 1), METRICSBUFSIZE > otherOffset ? METRICSBUFSIZE - otherOffset : 0, "},") - 1;
    
-   /* If something was written in buffer */
+   /*
+    * The length depends on the name of the nest (see higher up).
+    * If nothing was written then the buffer will look like: ' "example":}, ',
+    * not: ' "example":{}, ', because the last char is replaced by "},".
+    * Hence these numbers.
+    */
    if(coreOffset != 9){
       offset += snprintf (buf + offset, BUFSIZE > offset ? BUFSIZE - offset : 0, "%s", coreBuf);
    }
@@ -974,7 +996,11 @@ status_report( client_t *client , char *callback)
    if(otherOffset != 10){
       offset += snprintf (buf + offset, BUFSIZE > offset ? BUFSIZE - offset : 0, "%s", otherBuf);
    }
-   /* Remove trailing , */
+   
+   /*
+    * Remove trailing "," and replace by what's needed, depending on the
+    * existence of a callback function for the JSON data (see JSONP).
+    */
    snprintf (buf + (offset - 1), BUFSIZE > offset - 1 ? BUFSIZE - (offset + 1) : 0,  callback != NULL ? "}})\r\n" : "}}\r\n");
    
    /* End local metrics */
@@ -1184,8 +1210,8 @@ server_thread (void *arg)
                debug_msg("server_thread() received request \"%s\" from %s", request, remote_ip);
                rc = process_request(&client, request);
                afternow = apr_time_now();
-               ganglia_scoreboard_set(TIME_TCP_REQS_ALL, afternow - now);//Port 8652
-               ganglia_scoreboard_set(TIME_TCP_REQS_INTXML, afternow - now);
+               ganglia_scoreboard_incby(TIME_TCP_REQS_ALL, afternow - now);//Port 8652
+               ganglia_scoreboard_incby(TIME_TCP_REQS_INTXML, afternow - now);
                if (rc == 1)
                   {
                      err_msg("Got a malformed path request from %s", remote_ip);
@@ -1225,8 +1251,8 @@ server_thread (void *arg)
             }
             else{
                 afternow = apr_time_now();
-                ganglia_scoreboard_set(TIME_TCP_REQS_ALL, afternow - now);//Port 8651
-                ganglia_scoreboard_set(TIME_TCP_REQS_XML, afternow - now);
+                ganglia_scoreboard_incby(TIME_TCP_REQS_ALL, afternow - now);//Port 8651
+                ganglia_scoreboard_incby(TIME_TCP_REQS_XML, afternow - now);
          }
 
          if(root_report_end(&client))

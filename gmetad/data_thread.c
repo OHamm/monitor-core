@@ -20,7 +20,7 @@ extern hash_t *root;
 
 extern int process_xml(data_source_list_t *, char *);
 
-apr_time_t last_poll;
+apr_time_t last_poll_ok, last_poll_failed;
 
 void *
 data_thread ( void *arg )
@@ -34,7 +34,7 @@ data_thread ( void *arg )
    /* This will grow as needed */
    unsigned int buf_size = 1024*128, read_index, read_available;
    struct pollfd struct_poll;
-   apr_time_t start, end, after_poll, now;
+   apr_time_t start, end, end_poll;
    apr_interval_time_t sleep_time, elapsed;
    double random_factor;
    unsigned int rand_seed;
@@ -75,7 +75,8 @@ data_thread ( void *arg )
 
          /* If there was no good connection last time or the above connect failed then try each host in the list. */
          if(!sock)
-           {
+         {
+             ganglia_scoreboard_inc(DS_POLL_FAILED_REQS);
              for(i=0; i < d->num_sources; i++)
                {
                  /* Find first viable source in list. */
@@ -86,7 +87,8 @@ data_thread ( void *arg )
                      break;
                    }
                  else
-                   {
+                 {
+                     ganglia_scoreboard_inc(DS_POLL_FAILED_REQS);
                      err_msg("data_thread() for [%s] failed to contact node %s", d->name, d->sources[i]->name);
                    }
                }
@@ -100,19 +102,13 @@ data_thread ( void *arg )
             }
 
          struct_poll.fd = sock->sockfd;
-         struct_poll.events = POLLIN; 
+         struct_poll.events = POLLIN;
 
          read_index = 0;
          for(;;)
             {
-               ganglia_scoreboard_inc(DS_POLL_REQS);
-               now = apr_time_now();
                /* Timeout set to 10 seconds */
                rval = poll( &struct_poll, 1, 10000);
-               after_poll = apr_time_now();
-               ganglia_scoreboard_incby(DS_POLL_DURATION, after_poll - now);
-               last_poll = after_poll;
-               
                if( rval < 0 )
                   {
                      /* Error */
@@ -291,7 +287,7 @@ data_thread ( void *arg )
 	   }
 
          buf[read_index] = '\0';
-
+         end_poll = apr_time_now();
          /* Parse the buffer */
          rval = process_xml(d, buf);
          if(rval)
@@ -306,6 +302,16 @@ data_thread ( void *arg )
          d->dead = 0;
 
        take_a_break:
+        if(d->dead){
+            end_poll = apr_time_now();
+            ganglia_scoreboard_inc(DS_POLL_FAILED_REQS);
+            ganglia_scoreboard_incby(DS_POLL_FAILED_DURATION, end_poll - start);
+            last_poll_failed = end_poll;
+        }else{
+            ganglia_scoreboard_inc(DS_POLL_OK_REQS);
+            ganglia_scoreboard_incby(DS_POLL_OK_DURATION, end_poll - start);
+            last_poll_ok = end_poll;
+        }
          g_tcp_socket_delete(sock);
 
          end = apr_time_now();
@@ -313,8 +319,11 @@ data_thread ( void *arg )
          random_factor = 1 + (SLEEP_RANDOMIZE / 50.0) * ((rand_r(&rand_seed) - RAND_MAX/2)/(float)RAND_MAX);
          elapsed = end - start;
          sleep_time = apr_time_from_sec(d->step) * random_factor - elapsed;
-         if(sleep_time > 0)
-           apr_sleep(sleep_time); 
+         if(sleep_time > 0){
+           apr_sleep(sleep_time);
+         }else{
+             ganglia_scoreboard_inc(DS_POLL_MISS);
+         }
       }
    return NULL;
 }

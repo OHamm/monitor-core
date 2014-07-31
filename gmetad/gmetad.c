@@ -266,9 +266,12 @@ out:
 void initialize_scoreboard()
 {
     ganglia_scoreboard_init(global_context);
-    
-    ganglia_scoreboard_add(DS_POLL_REQS, GSB_COUNTER);
-    ganglia_scoreboard_add(DS_POLL_DURATION, GSB_COUNTER);
+
+    ganglia_scoreboard_add(DS_POLL_OK_REQS, GSB_COUNTER);
+    ganglia_scoreboard_add(DS_POLL_OK_DURATION, GSB_COUNTER);
+    ganglia_scoreboard_add(DS_POLL_FAILED_REQS, GSB_COUNTER);
+    ganglia_scoreboard_add(DS_POLL_FAILED_DURATION, GSB_COUNTER);
+    ganglia_scoreboard_add(DS_POLL_MISS, GSB_COUNTER);
 
     ganglia_scoreboard_add(METS_RECVD_ALL, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SENT_ALL, GSB_COUNTER);
@@ -284,8 +287,9 @@ void initialize_scoreboard()
     ganglia_scoreboard_add(METS_GRAPHITE_DURATION, GSB_COUNTER);
     ganglia_scoreboard_add(METS_MEMCACHED_DURATION, GSB_COUNTER);
     ganglia_scoreboard_add(METS_RIEMANN_DURATION, GSB_COUNTER);
-
-    ganglia_scoreboard_add(METS_SUMRZ_NUM, GSB_COUNTER);
+    
+    ganglia_scoreboard_add(METS_SUMRZ_ROOT, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_SUMRZ_CLUSTER, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SUMRZ_DURATION, GSB_COUNTER);
     
     ganglia_scoreboard_add(NBR_TCP_REQS_ALL, GSB_COUNTER);
@@ -295,29 +299,9 @@ void initialize_scoreboard()
     ganglia_scoreboard_add(NBR_TCP_REQS_INTXML, GSB_COUNTER);
     ganglia_scoreboard_add(TIME_TCP_REQS_INTXML, GSB_COUNTER);
     
-    
     /*
-     ganglia_scoreboard_add(INTER_IMPORTS_NBR_ALL, GSB_COUNTER);
-     ganglia_scoreboard_add(INTER_IMPORTS_NBR_RRDTOOLS, GSB_COUNTER);
-     ganglia_scoreboard_add(INTER_IMPORTS_NBR_RRDCACHED, GSB_COUNTER);
-     ganglia_scoreboard_add(INTER_IMPORTS_NBR_GRAPHITE, GSB_COUNTER);
-     ganglia_scoreboard_add(INTER_IMPORTS_NBR_MEMCACHED, GSB_COUNTER);
-     ganglia_scoreboard_add(INTER_IMPORTS_NBR_RIEMANN, GSB_COUNTER);
-    
-    ganglia_scoreboard_add(INTER_IMPORTS_TIME_EXP_ALL, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_IMPORTS_TIME_EXP_RRDTOOLS, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_IMPORTS_TIME_EXP_RRDCACHED, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_IMPORTS_TIME_EXP_GRAPHITE, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_IMPORTS_TIME_EXP_MEMCACHED, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_IMPORTS_TIME_EXP_RIEMANN, GSB_COUNTER);
-    
-    ganglia_scoreboard_add(INTER_IMPORTS_LAST_EXP_ALL, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_IMPORTS_LAST_EXP_RRDTOOLS, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_IMPORTS_LAST_EXP_RRDCACHED, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_IMPORTS_LAST_EXP_GRAPHITE, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_IMPORTS_LAST_EXP_MEMCACHED, GSB_COUNTER);
-    ganglia_scoreboard_add(INTER_IMPORTS_LAST_EXP_RIEMANN, GSB_COUNTER);
-    
+     ganglia_scoreboard_add(INTER_LATENCY_TIME_ALL);"
+     ganglia_scoreboard_add(INTER_LATENCY__ALL);
     */
 }
 
@@ -350,7 +334,8 @@ write_root_summary(datum_t *key, datum_t *val, void *arg)
    /* Don't write a summary for metris that appears to be sFlow VM metrics */
    if (gmetad_config.unsummarized_sflow_vm_metrics && (p = strchr(name, '.')) != NULL && *(p+1) == 'v')
      return 0;
-
+   
+   ganglia_scoreboard_inc(METS_SUMRZ_ROOT);
    /* We log all our sums in double which does not suffer from
       wraparound errors: for example memory KB exceeding 4TB. -twitham */
    sprintf(sum, "%.5f", metric->val.d);
@@ -364,7 +349,7 @@ write_root_summary(datum_t *key, datum_t *val, void *arg)
 	     return 0;
 
    debug_msg("Writing Root Summary data for metric %s", name);
-
+   
    rc = write_data_to_rrd( NULL, NULL, name, sum, num, 15, 0, metric->slope);
    if (rc)
       {
@@ -613,14 +598,14 @@ main ( int argc, char *argv[] )
    last_metadata = apr_time_now();
    for(;;)
    {
-         ganglia_scoreboard_inc(METS_SUMRZ_NUM);
          /* Do at a random interval, between 
                  (shortest_step/2) +/- METADATA_SLEEP_RANDOMIZE percent */
          random_sleep_factor = (1 + (METADATA_SLEEP_RANDOMIZE / 50.0) * ((rand_r(&rand_seed) - RAND_MAX/2)/(float)RAND_MAX));
          sleep_time = random_sleep_factor * apr_time_from_sec(c->shortest_step) / 2;
          /* Make sure the sleep time is at least 1 second */
-         if(apr_time_sec(apr_time_now() + sleep_time) < (METADATA_MINIMUM_SLEEP + apr_time_sec(apr_time_now())))
+         if(apr_time_sec(apr_time_now() + sleep_time) < (METADATA_MINIMUM_SLEEP + apr_time_sec(apr_time_now()))){
             sleep_time += apr_time_from_sec(METADATA_MINIMUM_SLEEP);
+         }
          apr_sleep(sleep_time);
          
          /* Need to be sure root is locked while doing summary */
