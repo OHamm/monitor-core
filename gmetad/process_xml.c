@@ -1251,6 +1251,7 @@ endElement_GRID(void *data, const char *el)
                return 1;
          }
          /* Write the metric summaries to the RRD. */
+         ganglia_scoreboard_inc(METS_SUMRZ_GRID);
          hash_foreach(summary, finish_processing_source, data);
       }
    return 0;
