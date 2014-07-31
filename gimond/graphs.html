@@ -80,7 +80,7 @@
                     case "Sent":
                         sent_chart.draw(data, options);
                     break;
-                    case "Sent_time":
+                    case "Sent time":
                         sent_time_chart.draw(data, options);
                     break;
                     case "Cpu":
@@ -89,7 +89,7 @@
                     case "Polls/min":
                         poll_chart.draw(data, options);
                     break;
-                    case "Poll_time":
+                    case "Poll time":
                         poll_time_chart.draw(data, options);
                     break;
                     case "Received":
@@ -98,13 +98,13 @@
                     case "Summarized":
                         sumrz_chart.draw(data, options);
                     break;
-                    case "Summarize_time":
+                    case "Summarize time":
                         sumrz_time_chart.draw(data, options);
                     break;
                     case "Requests":
                         req_chart.draw(data, options);
                     break;
-                    case "Requests_time":
+                    case "Requests time":
                         req_time_chart.draw(data, options);
                     break;
                     default:
@@ -163,7 +163,7 @@
                                     (tmpmemcachedvar[1] != 0 ? (data["metrics"]["sent"]["memcached"]["totalMillis"] - tmpmemcachedvar[1]) : 0),
                                     (tmpriemannvar[1] != 0 ? (data["metrics"]["sent"]["riemann"]["totalMillis"] - tmpriemannvar[1]) : 0)
                                  ]);
-                drawChart('Sent_time', sent_time_data);
+                drawChart('Sent time', sent_time_data);
 
                 tmpsentallvar[0] = data["metrics"]["sent"]["all"]["num"];
                 tmprrdtoolvar[0] = data["metrics"]["sent"]["rrdtool"]["num"];
@@ -189,7 +189,7 @@
                                     (tmppollokvar[1] != 0 ? (data["metrics"]["polls"]["ok"]["totalMillis"] - tmppollokvar[1]) : 0),
                                     (tmppollfailvar[1] != 0 ? (data["metrics"]["polls"]["failed"]["totalMillis"] - tmppollfailvar[1]) : 0)
                                  ]);
-                drawChart('Poll_time', poll_time_data);
+                drawChart('Poll time', poll_time_data);
 
                 tmppollokvar[0] = data["metrics"]["polls"]["ok"]["num"];
                 tmppollokvar[1] = data["metrics"]["polls"]["ok"]["totalMillis"];
@@ -210,7 +210,7 @@
                 sumrz_time_data.push([new Date(data["stattime"]),
                                     (tmpsumrzvar[1] != 0 ? (data["metrics"]["summarize"]["totalMillis"] - tmpsumrzvar[1]) : 0)
                                  ]);
-                drawChart('Summarize_time', sumrz_time_data);
+                drawChart('Summarize time', sumrz_time_data);
 
                 tmpsumrzvar[0] = data["metrics"]["summarize"]["num"];
                 tmpsumrzvar[1] = data["metrics"]["summarize"]["totalMillis"];
@@ -227,7 +227,7 @@
                                     (tmpinteractivevar[1] != 0 ? (data["metrics"]["requests"]["interactive"]["totalMillis"] - tmpinteractivevar[1]) : 0),
                                     (tmpxmlvar[1] != 0 ? (data["metrics"]["requests"]["xml"]["totalMillis"] - tmpxmlvar[1]) : 0)
                                  ]);
-                drawChart('Requests_time', req_time_data);
+                drawChart('Requests time', req_time_data);
 
                 tmpreqallvar[0] = data["metrics"]["requests"]["all"]["num"];
                 tmpreqallvar[1] = data["metrics"]["requests"]["all"]["totalMillis"];
