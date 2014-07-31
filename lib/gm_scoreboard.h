@@ -35,6 +35,7 @@ typedef enum ganglia_scoreboard_types ganglia_scoreboard_types;
 #define DS_POLL_OK_DURATION "ds_poll_ok_duration"
 #define DS_POLL_FAILED_REQS "ds_poll_failed_reqs"
 #define DS_POLL_FAILED_DURATION "ds_poll_failed_duration"
+#define DS_POLL_MISS "ds_poll_miss"
 
 #define NBR_TCP_REQS_ALL "nbr_tcp_reqs_all"
 #define TIME_TCP_REQS_ALL "time_tcp_reqs_all"
@@ -43,8 +44,11 @@ typedef enum ganglia_scoreboard_types ganglia_scoreboard_types;
 #define NBR_TCP_REQS_INTXML "nbr_tcp_reqs_intxml"
 #define TIME_TCP_REQS_INTXML "time_tcp_reqs_intxml"
 
-#define METS_SUMRZ_NUM "mets_sumrz_num"
+#define METS_SUMRZ_ROOT "mets_sumrz_root"
+#define METS_SUMRZ_CLUSTER "mets_sumrz_cluster"
+#define METS_SUMRZ_GRID "mets_sumrz_grid"
 #define METS_SUMRZ_DURATION "mets_sumrz_duration"
+#define METS_SUMRZ_MISS "mets_sumrz_miss"
 
 /*
 #define INTER_LATENCY_TIME_ALL "gmetad_internal_latency_time_all"

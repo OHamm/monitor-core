@@ -318,8 +318,11 @@ data_thread ( void *arg )
          random_factor = 1 + (SLEEP_RANDOMIZE / 50.0) * ((rand_r(&rand_seed) - RAND_MAX/2)/(float)RAND_MAX);
          elapsed = end - start;
          sleep_time = apr_time_from_sec(d->step) * random_factor - elapsed;
-         if(sleep_time > 0)
-           apr_sleep(sleep_time); 
+         if(sleep_time > 0){
+           apr_sleep(sleep_time);
+         }else{
+             ganglia_scoreboard_inc(DS_POLL_MISS);
+         }
       }
    return NULL;
 }

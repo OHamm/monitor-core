@@ -273,6 +273,7 @@ void initialize_scoreboard()
     ganglia_scoreboard_add(DS_POLL_OK_DURATION, GSB_COUNTER);
     ganglia_scoreboard_add(DS_POLL_FAILED_REQS, GSB_COUNTER);
     ganglia_scoreboard_add(DS_POLL_FAILED_DURATION, GSB_COUNTER);
+    ganglia_scoreboard_add(DS_POLL_MISS, GSB_COUNTER);
 
     ganglia_scoreboard_add(METS_RECVD_ALL, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SENT_ALL, GSB_COUNTER);
@@ -288,9 +289,12 @@ void initialize_scoreboard()
     ganglia_scoreboard_add(METS_GRAPHITE_DURATION, GSB_COUNTER);
     ganglia_scoreboard_add(METS_MEMCACHED_DURATION, GSB_COUNTER);
     ganglia_scoreboard_add(METS_RIEMANN_DURATION, GSB_COUNTER);
-
-    ganglia_scoreboard_add(METS_SUMRZ_NUM, GSB_COUNTER);
+    
+    ganglia_scoreboard_add(METS_SUMRZ_ROOT, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_SUMRZ_CLUSTER, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_SUMRZ_GRID, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SUMRZ_DURATION, GSB_COUNTER);
+    ganglia_scoreboard_add(METS_SUMRZ_MISS, GSB_COUNTER);
     
     ganglia_scoreboard_add(NBR_TCP_REQS_ALL, GSB_COUNTER);
     ganglia_scoreboard_add(TIME_TCP_REQS_ALL, GSB_COUNTER);
@@ -298,7 +302,7 @@ void initialize_scoreboard()
     ganglia_scoreboard_add(TIME_TCP_REQS_XML, GSB_COUNTER);
     ganglia_scoreboard_add(NBR_TCP_REQS_INTXML, GSB_COUNTER);
     ganglia_scoreboard_add(TIME_TCP_REQS_INTXML, GSB_COUNTER);
-
+    
     /*
      ganglia_scoreboard_add(INTER_LATENCY_TIME_ALL);"
      ganglia_scoreboard_add(INTER_LATENCY__ALL);
@@ -335,7 +339,7 @@ write_root_summary(datum_t *key, datum_t *val, void *arg)
    if (gmetad_config.unsummarized_sflow_vm_metrics && (p = strchr(name, '.')) != NULL && *(p+1) == 'v')
      return 0;
    
-   ganglia_scoreboard_inc(METS_SUMRZ_NUM);
+   ganglia_scoreboard_inc(METS_SUMRZ_ROOT);
    /* We log all our sums in double which does not suffer from
       wraparound errors: for example memory KB exceeding 4TB. -twitham */
    sprintf(sum, "%.5f", metric->val.d);
@@ -598,14 +602,17 @@ main ( int argc, char *argv[] )
    last_metadata = apr_time_now();
    for(;;)
    {
-         ganglia_scoreboard_inc(METS_SUMRZ_NUM);
+         ganglia_scoreboard_inc(METS_SUMRZ_GRID);
          /* Do at a random interval, between 
                  (shortest_step/2) +/- METADATA_SLEEP_RANDOMIZE percent */
          random_sleep_factor = (1 + (METADATA_SLEEP_RANDOMIZE / 50.0) * ((rand_r(&rand_seed) - RAND_MAX/2)/(float)RAND_MAX));
          sleep_time = random_sleep_factor * apr_time_from_sec(c->shortest_step) / 2;
          /* Make sure the sleep time is at least 1 second */
-         if(apr_time_sec(apr_time_now() + sleep_time) < (METADATA_MINIMUM_SLEEP + apr_time_sec(apr_time_now())))
+         if(apr_time_sec(apr_time_now() + sleep_time) < (METADATA_MINIMUM_SLEEP + apr_time_sec(apr_time_now()))){
             sleep_time += apr_time_from_sec(METADATA_MINIMUM_SLEEP);
+         }else{
+            ganglia_scoreboard_inc(METS_SUMRZ_MISS);
+         }
          apr_sleep(sleep_time);
          
          /* Need to be sure root is locked while doing summary */
