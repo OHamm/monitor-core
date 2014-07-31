@@ -288,14 +288,17 @@
             }
 
             function last_timeCallback(data){
-                $("#last_poll_ok").text((data["metrics"]["polls"]["ok"]["lastTime"]!= 0 ? toSecondsAgo(data["metrics"]["polls"]["ok"]["lastTime"]) + "s" : "n/a"));
-                $("#last_poll_fail").text((data["metrics"]["polls"]["failed"]["lastTime"]!= 0 ? toSecondsAgo(data["metrics"]["polls"]["failed"]["lastTime"]) + "s" : "n/a"));
-                $("#last_summary").text((data["metrics"]["summarize"]["lastTime"]!= 0 ? toSecondsAgo(data["metrics"]["summarize"]["lastTime"]) + "s" : "n/a"));
-                $("#last_rrd").text((data["metrics"]["sent"]["rrdtool"]["lastTime"]!= 0 ? toSecondsAgo(data["metrics"]["sent"]["rrdtool"]["lastTime"]) + "s" : "n/a"));
-                $("#last_rrdcached").text((data["metrics"]["sent"]["rrdcached"]["lastTime"]!= 0 ? toSecondsAgo(data["metrics"]["sent"]["rrdcached"]["lastTime"]) + "s" : "n/a"));
-                $("#last_graphite").text((data["metrics"]["sent"]["graphite"]["lastTime"]!= 0 ? toSecondsAgo(data["metrics"]["sent"]["graphite"]["lastTime"]) + "s" : "n/a"));
-                $("#last_memcached").text((data["metrics"]["sent"]["memcached"]["lastTime"]!= 0 ? toSecondsAgo(data["metrics"]["sent"]["memcached"]["lastTime"]) + "s" : "n/a"));
-                $("#last_riemann").text((data["metrics"]["sent"]["riemann"]["lastTime"]!= 0 ? toSecondsAgo(data["metrics"]["sent"]["riemann"]["lastTime"]) + "s" : "n/a"));
+                /* 0 means no data received. */
+                $("#last_poll_ok").text((data["metrics"]["polls"]["ok"]["lastTime"] != 0 ?
+                            (toSecondsAgo(data["metrics"]["polls"]["ok"]["lastTime"]) > 1000 ? "> 15mins" : toSecondsAgo(data["metrics"]["polls"]["ok"]["lastTime"]) + "s" ) : "n/a"));
+                $("#last_poll_fail").text((data["metrics"]["polls"]["failed"]["lastTime"] != 0 ?
+                            (toSecondsAgo(data["metrics"]["polls"]["failed"]["lastTime"]) > 1000 ? "> 15mins" : toSecondsAgo(data["metrics"]["polls"]["failed"]["lastTime"]) + "s" ) : "n/a"));
+                $("#last_summary").text((data["metrics"]["summarize"]["lastTime"] != 0 ? toSecondsAgo(data["metrics"]["summarize"]["lastTime"]) + "s" : "n/a"));
+                $("#last_rrd").text((data["metrics"]["sent"]["rrdtool"]["lastTime"] != 0 ? toSecondsAgo(data["metrics"]["sent"]["rrdtool"]["lastTime"]) + "s" : "n/a"));
+                $("#last_rrdcached").text((data["metrics"]["sent"]["rrdcached"]["lastTime"] != 0 ? toSecondsAgo(data["metrics"]["sent"]["rrdcached"]["lastTime"]) + "s" : "n/a"));
+                $("#last_graphite").text((data["metrics"]["sent"]["graphite"]["lastTime"] != 0 ? toSecondsAgo(data["metrics"]["sent"]["graphite"]["lastTime"]) + "s" : "n/a"));
+                $("#last_memcached").text((data["metrics"]["sent"]["memcached"]["lastTime"] != 0 ? toSecondsAgo(data["metrics"]["sent"]["memcached"]["lastTime"]) + "s" : "n/a"));
+                $("#last_riemann").text((data["metrics"]["sent"]["riemann"]["lastTime"] != 0 ? toSecondsAgo(data["metrics"]["sent"]["riemann"]["lastTime"]) + "s" : "n/a"));
             }
         </script>
     </head>
