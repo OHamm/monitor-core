@@ -750,7 +750,7 @@ status_report( client_t *client , char *callback)
        "\"num\":%u,"
        "\"totalMillis\":%lu,"
        "\"lastTime\":%lu"
-       "},"
+       "}"
        "},"
        ,
        callback != NULL ? callback : "",
