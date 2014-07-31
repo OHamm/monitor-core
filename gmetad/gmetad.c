@@ -294,7 +294,6 @@ void initialize_scoreboard()
     ganglia_scoreboard_add(METS_SUMRZ_CLUSTER, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SUMRZ_GRID, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SUMRZ_DURATION, GSB_COUNTER);
-    ganglia_scoreboard_add(METS_SUMRZ_MISS, GSB_COUNTER);
     
     ganglia_scoreboard_add(NBR_TCP_REQS_ALL, GSB_COUNTER);
     ganglia_scoreboard_add(TIME_TCP_REQS_ALL, GSB_COUNTER);
@@ -609,8 +608,6 @@ main ( int argc, char *argv[] )
          /* Make sure the sleep time is at least 1 second */
          if(apr_time_sec(apr_time_now() + sleep_time) < (METADATA_MINIMUM_SLEEP + apr_time_sec(apr_time_now()))){
             sleep_time += apr_time_from_sec(METADATA_MINIMUM_SLEEP);
-         }else{
-            ganglia_scoreboard_inc(METS_SUMRZ_MISS);
          }
          apr_sleep(sleep_time);
          

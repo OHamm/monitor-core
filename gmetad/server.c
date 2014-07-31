@@ -721,8 +721,7 @@ status_report( client_t *client , char *callback)
        "\"cluster\":%u,"
        "\"root\":%u,"
        "\"totalMillis\":%lu,"
-       "\"lastTime\":%lu,"
-       "\"misses\":%u"
+       "\"lastTime\":%lu"
        "},"
        "\"requests\":{"
        "\"all\":{"
@@ -789,7 +788,6 @@ status_report( client_t *client , char *callback)
        ganglia_scoreboard_get(METS_SUMRZ_ROOT),
        (long int)(ganglia_scoreboard_get(METS_SUMRZ_DURATION) / APR_TIME_C(1000)), // ms
        (long int)(last_metadata / APR_TIME_C(1000)), // ms
-       ganglia_scoreboard_get(METS_SUMRZ_MISS),
        ganglia_scoreboard_get(NBR_TCP_REQS_ALL),
        (long int)(ganglia_scoreboard_get(TIME_TCP_REQS_ALL) / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(NBR_TCP_REQS_INTXML),

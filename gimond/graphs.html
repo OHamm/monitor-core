@@ -19,7 +19,7 @@
             var timespawn;
             var tmpsentallvar, tmprrdtoolvar, tmprrdcachedvar, tmpgraphitevar, tmpmemcachedvar, tmpriemannvar;
             var tmppollokvar, tmppollfailvar, tmpsumrzvar, tmpreqallvar, tmpinteractivevar, tmpxmlvar;
-            var tmprecvvar, tmpsumrzgridvar, tmpsumrzclustvar, tmpsumrzrootvar, tmpsumrzmissvar, tmppollmissvar; 
+            var tmprecvvar, tmpsumrzgridvar, tmpsumrzclustvar, tmpsumrzrootvar, tmppollmissvar;
 
             /* Google charts code */
             google.load("visualization", "1", {packages:["corechart"]});
@@ -44,7 +44,7 @@
                 poll_data = [["Date", "Ok", "Failed", "Misses"]];
                 poll_time_data = [["Date", "Ok", "Failed"]];
                 recv_data = [["Date", "Metrics/min"]];
-                sumrz_data = [["Date", "Grid", "Cluster", "Root", "Misses"]];
+                sumrz_data = [["Date", "Grid", "Cluster", "Root"]];
                 sumrz_time_data = [["Date", "Time"]];
                 req_data = [["Date", "All", "Interactive", "xml"]];
                 req_time_data = [["Date", "All", "Interactive", "xml"]];
@@ -56,7 +56,7 @@
                 tmpsumrzclustvar = 0; tmpsumrzrootvar = 0;
                 tmpsumrzvar = 0; tmpreqallvar = [0, 0];
                 tmpinteractivevar = [0, 0]; tmpxmlvar = [0, 0];
-                tmpsumrzmissvar = 0; tmppollmissvar = 0;
+                tmppollmissvar = 0;
             }
 
             function drawChart(name, metrics_data){
@@ -209,8 +209,7 @@
                 sumrz_data.push([new Date(data["stattime"]),
                                     (tmpsumrzgridvar != 0 ? (data["metrics"]["summarize"]["grid"] - tmpsumrzgridvar) : 0),
                                     (tmpsumrzclustvar != 0 ? (data["metrics"]["summarize"]["cluster"] - tmpsumrzclustvar) : 0),
-                                    (tmpsumrzrootvar != 0 ? (data["metrics"]["summarize"]["root"] - tmpsumrzrootvar) : 0),
-                                    (tmpsumrzmissvar != 0 ? (data["metrics"]["summarize"]["misses"] - tmpsumrzmissvar) : 0)
+                                    (tmpsumrzrootvar != 0 ? (data["metrics"]["summarize"]["root"] - tmpsumrzrootvar) : 0)
                                  ]);
                 drawChart('Summarizations/min', sumrz_data);
 
@@ -223,7 +222,6 @@
                 tmpsumrzclustvar = data["metrics"]["summarize"]["cluster"];
                 tmpsumrzrootvar = data["metrics"]["summarize"]["root"];
                 tmpsumrzvar = data["metrics"]["summarize"]["totalMillis"];
-                tmpsumrzmissvar = data["metrics"]["summarize"]["misses"];
 
                 req_data.push([new Date(data["stattime"]),
                                     (tmpreqallvar[0] != 0 ? (data["metrics"]["requests"]["all"]["num"] - tmpreqallvar[0]) : 0),
