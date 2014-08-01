@@ -334,7 +334,7 @@ write_root_summary(datum_t *key, datum_t *val, void *arg)
    /* Don't write a summary for metris that appears to be sFlow VM metrics */
    if (gmetad_config.unsummarized_sflow_vm_metrics && (p = strchr(name, '.')) != NULL && *(p+1) == 'v')
      return 0;
-   
+
    ganglia_scoreboard_inc(METS_SUMRZ_ROOT);
    /* We log all our sums in double which does not suffer from
       wraparound errors: for example memory KB exceeding 4TB. -twitham */
@@ -349,7 +349,7 @@ write_root_summary(datum_t *key, datum_t *val, void *arg)
 	     return 0;
 
    debug_msg("Writing Root Summary data for metric %s", name);
-   
+
    rc = write_data_to_rrd( NULL, NULL, name, sum, num, 15, 0, metric->slope);
    if (rc)
       {
@@ -603,9 +603,8 @@ main ( int argc, char *argv[] )
          random_sleep_factor = (1 + (METADATA_SLEEP_RANDOMIZE / 50.0) * ((rand_r(&rand_seed) - RAND_MAX/2)/(float)RAND_MAX));
          sleep_time = random_sleep_factor * apr_time_from_sec(c->shortest_step) / 2;
          /* Make sure the sleep time is at least 1 second */
-         if(apr_time_sec(apr_time_now() + sleep_time) < (METADATA_MINIMUM_SLEEP + apr_time_sec(apr_time_now()))){
+         if(apr_time_sec(apr_time_now() + sleep_time) < (METADATA_MINIMUM_SLEEP + apr_time_sec(apr_time_now())))
             sleep_time += apr_time_from_sec(METADATA_MINIMUM_SLEEP);
-         }
          apr_sleep(sleep_time);
          
          /* Need to be sure root is locked while doing summary */
@@ -625,7 +624,7 @@ main ( int argc, char *argv[] )
 
          /* Save them to RRD */
          hash_foreach(root.metric_summary, write_root_summary, NULL);
-         
+
          /* Remember our last run */
          ganglia_scoreboard_incby(METS_SUMRZ_DURATION, apr_time_now() - summary_started);
          last_metadata = apr_time_now();

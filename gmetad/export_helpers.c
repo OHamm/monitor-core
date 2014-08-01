@@ -233,6 +233,7 @@ push_data_to_carbon( char *graphite_msg)
        carbon_struct_poll.events = POLLOUT;
 
        poll_rval = poll( &carbon_struct_poll, 1, carbon_timeout ); // default timeout .5s
+
        /* Send data to the server when the socket becomes ready */
       if( poll_rval < 0 ) {
         debug_msg("carbon proxy:: poll() error");
@@ -358,6 +359,7 @@ int
 write_data_to_carbon ( const char *source, const char *host, const char *metric, 
                     const char *sum, unsigned int process_time )
 {
+
     apr_time_t start = apr_time_now(), now;
     int hostlen=strlen(host);
     char hostcp[hostlen+1]; 
@@ -365,7 +367,7 @@ write_data_to_carbon ( const char *source, const char *host, const char *metric,
     char sourcecp[sourcelen+1];
     int metriclen=strlen(metric);
     char metriccp[metriclen+1];
-    char s_process_time[15];
+       char s_process_time[15];
     char graphite_msg[ PATHSIZE + 1 ];
     int i;
     int ret;
@@ -389,7 +391,7 @@ write_data_to_carbon ( const char *source, const char *host, const char *metric,
                        }else{
                                sourcecp[i]=source[i];
                        }
-               }
+       }
                 sourcecp[i+1]=0;
    }
 
