@@ -361,7 +361,7 @@ write_data_to_carbon ( const char *source, const char *host, const char *metric,
 {
 
 	int hostlen=strlen(host);
-	char hostcp[hostlen+1];
+	char hostcp[hostlen+1]; 
 	int sourcelen=strlen(source);		
 	char sourcecp[sourcelen+1];
     int metriclen=strlen(metric);
