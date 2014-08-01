@@ -1161,7 +1161,7 @@ server_thread (void *arg)
                now = apr_time_now();
             }
          else
-         {
+            {
                pthread_mutex_lock  ( &server_socket_mutex );
                SYS_CALL( client.fd, accept(server_socket->sockfd, (struct sockaddr *) &(client.addr), &len));
                pthread_mutex_unlock( &server_socket_mutex );
@@ -1225,10 +1225,11 @@ server_thread (void *arg)
                      continue;
                   }
             }
-         else{
-             ganglia_scoreboard_inc(NBR_TCP_REQS_ALL);
-             strcpy(request, "/");
-         }
+         else
+            {
+                ganglia_scoreboard_inc(NBR_TCP_REQS_ALL);
+                strcpy(request, "/");
+            }
 
          if(root_report_start(&client))
             {

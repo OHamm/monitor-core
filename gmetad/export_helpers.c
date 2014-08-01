@@ -189,6 +189,7 @@ push_data_to_carbon( char *graphite_msg)
 
   if (!strcmp(gmetad_config.carbon_protocol, "tcp"))
     {
+
       int port;
       int carbon_socket;
       struct sockaddr_in server;
@@ -380,15 +381,16 @@ write_data_to_carbon ( const char *source, const char *host, const char *metric,
 
 	/*prep the source name*/
    if (source) {
-      /* find and replace space for _ in the sourcename*/
-      for(i=0; i<=sourcelen; i++){
-         if ( source[i] == ' ') {
-            sourcecp[i]='_';
-         }else{
-            sourcecp[i]=source[i];
-         }
-      }
-      sourcecp[i+1]=0;
+           
+               /* find and replace space for _ in the sourcename*/
+               for(i=0; i<=sourcelen; i++){
+                       if ( source[i] == ' ') {
+                               sourcecp[i]='_';
+                       }else{
+                               sourcecp[i]=source[i];
+                       }
+               }
+                sourcecp[i+1]=0;
    }
 
 

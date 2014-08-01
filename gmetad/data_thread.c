@@ -75,7 +75,7 @@ data_thread ( void *arg )
 
          /* If there was no good connection last time or the above connect failed then try each host in the list. */
          if(!sock)
-         {
+           {
              for(i=0; i < d->num_sources; i++)
                {
                  /* Find first viable source in list. */
@@ -86,7 +86,7 @@ data_thread ( void *arg )
                      break;
                    }
                  else
-                 {
+                   {
                      err_msg("data_thread() for [%s] failed to contact node %s", d->name, d->sources[i]->name);
                    }
                }
@@ -100,7 +100,7 @@ data_thread ( void *arg )
             }
 
          struct_poll.fd = sock->sockfd;
-         struct_poll.events = POLLIN;
+         struct_poll.events = POLLIN; 
 
          read_index = 0;
          for(;;)

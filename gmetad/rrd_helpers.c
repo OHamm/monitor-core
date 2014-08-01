@@ -339,7 +339,7 @@ push_data_to_rrd( char *rrd, const char *sum, const char *num,
             return rval;
       }
    if (gmetad_config.rrdcached_addrstr != NULL)
-   {
+      {
          ganglia_scoreboard_inc(METS_SENT_RRDCACHED);
          ganglia_scoreboard_inc(METS_SENT_ALL);
          last_rrdcached = apr_time_now();
