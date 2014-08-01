@@ -1151,6 +1151,7 @@ server_thread (void *arg)
       {
          client.valid = 0;
          len = sizeof(client.addr);
+
          if (interactive)
             {
                pthread_mutex_lock(&server_interactive_mutex);
@@ -1208,6 +1209,7 @@ server_thread (void *arg)
                      continue;
                   }
                debug_msg("server_thread() received request \"%s\" from %s", request, remote_ip);
+
                rc = process_request(&client, request);
                afternow = apr_time_now();
                ganglia_scoreboard_incby(TIME_TCP_REQS_ALL, afternow - now);//Port 8652

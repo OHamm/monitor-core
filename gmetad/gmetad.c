@@ -606,7 +606,7 @@ main ( int argc, char *argv[] )
          if(apr_time_sec(apr_time_now() + sleep_time) < (METADATA_MINIMUM_SLEEP + apr_time_sec(apr_time_now())))
             sleep_time += apr_time_from_sec(METADATA_MINIMUM_SLEEP);
          apr_sleep(sleep_time);
-         
+
          /* Need to be sure root is locked while doing summary */
          pthread_mutex_lock(root.sum_finished);
 

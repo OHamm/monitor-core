@@ -234,7 +234,7 @@ push_data_to_carbon( char *graphite_msg)
 
        poll_rval = poll( &carbon_struct_poll, 1, carbon_timeout ); // default timeout .5s
 
-       /* Send data to the server when the socket becomes ready */
+      /* Send data to the server when the socket becomes ready */
       if( poll_rval < 0 ) {
         debug_msg("carbon proxy:: poll() error");
       } else if ( poll_rval == 0 ) {
@@ -360,11 +360,11 @@ write_data_to_carbon ( const char *source, const char *host, const char *metric,
                     const char *sum, unsigned int process_time )
 {
 
-    apr_time_t start = apr_time_now(), now;
-    int hostlen=strlen(host);
-    char hostcp[hostlen+1]; 
-    int sourcelen=strlen(source);
-    char sourcecp[sourcelen+1];
+        apr_time_t start = apr_time_now(), now;
+        int hostlen=strlen(host);
+        char hostcp[hostlen+1];
+        int sourcelen=strlen(source);
+        char sourcecp[sourcelen+1];
     int metriclen=strlen(metric);
     char metriccp[metriclen+1];
        char s_process_time[15];
@@ -372,9 +372,9 @@ write_data_to_carbon ( const char *source, const char *host, const char *metric,
     int i;
     int ret;
 
-    /*  if process_time is undefined, we set it to the current time */
-    if (!process_time) process_time = time(0);
-    sprintf(s_process_time, "%u", process_time);
+        /*  if process_time is undefined, we set it to the current time */
+        if (!process_time) process_time = time(0);
+        sprintf(s_process_time, "%u", process_time);
 
    /* prepend everything with graphite_prefix if it's set */
    if (gmetad_config.graphite_prefix != NULL && strlen(gmetad_config.graphite_prefix) > 1) {
@@ -393,7 +393,7 @@ write_data_to_carbon ( const char *source, const char *host, const char *metric,
                        }
        }
                 sourcecp[i+1]=0;
-   }
+       }
 
 
    /* prep the host name*/

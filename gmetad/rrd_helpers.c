@@ -190,7 +190,7 @@ reconnect:
                   }
             }
       }
-      
+
     ganglia_scoreboard_incby(METS_ALL_DURATION, apr_time_now() - start);
     ganglia_scoreboard_incby(METS_RRDCACHED_DURATION, apr_time_now() - start);
    return 0;

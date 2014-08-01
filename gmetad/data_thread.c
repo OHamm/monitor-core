@@ -283,7 +283,7 @@ data_thread ( void *arg )
 	       }
 	     inflateEnd(&strm);
 	   }
-
+	   
          buf[read_index] = '\0';
          end_poll = apr_time_now();
          /* Parse the buffer */

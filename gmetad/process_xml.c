@@ -663,6 +663,7 @@ startElement_METRIC(void *data, const char *el, const char **attr)
 
    metric = &(xmldata->metric);
    memset((void*) metric, 0, sizeof(*metric));
+
    /* Summarize all numeric metrics */
    do_summary = 0;
    tt = in_type_list(type, strlen(type));
@@ -1195,6 +1196,7 @@ finish_processing_source(datum_t *key, datum_t *val, void *arg)
 
        debug_msg("Writing Summary data for source %s, metric %s",
                  xmldata->sourcename, name);
+
        ganglia_scoreboard_inc(METS_SUMRZ_CLUSTER);
        xmldata->rval = write_data_to_rrd(xmldata->sourcename, NULL, name,
                                          sum, num, xmldata->ds->step,
