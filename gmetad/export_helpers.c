@@ -231,7 +231,6 @@ push_data_to_carbon( char *graphite_msg)
       /* Start Poll */
        carbon_struct_poll.fd=carbon_socket;
        carbon_struct_poll.events = POLLOUT;
-
        poll_rval = poll( &carbon_struct_poll, 1, carbon_timeout ); // default timeout .5s
 
       /* Send data to the server when the socket becomes ready */
@@ -479,7 +478,6 @@ write_data_to_carbon ( const char *source, const char *host, const char *metric,
   	strncat(graphite_msg, "\n", PATHSIZE-strlen(graphite_msg));
 
 	graphite_msg[strlen(graphite_msg)+1] = 0;
-        
         ret = push_data_to_carbon( graphite_msg );
         now = apr_time_now();
         ganglia_scoreboard_incby(METS_ALL_DURATION, now - start);

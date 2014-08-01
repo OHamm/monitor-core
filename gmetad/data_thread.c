@@ -322,7 +322,7 @@ data_thread ( void *arg )
          elapsed = end - start;
          sleep_time = apr_time_from_sec(d->step) * random_factor - elapsed;
          if(sleep_time > 0)
-           apr_sleep(sleep_time);
+           apr_sleep(sleep_time); 
          else
            ganglia_scoreboard_inc(DS_POLL_MISS);
       }
