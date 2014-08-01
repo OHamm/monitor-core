@@ -656,7 +656,7 @@ status_report( client_t *client , char *callback)
    int rval, len, i, offset;
    char buf[BUFSIZE];
    g_val_t val;
-   
+
    debug_msg("Stat request...");
 
    if(! client->valid )

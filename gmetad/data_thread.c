@@ -283,8 +283,9 @@ data_thread ( void *arg )
 	       }
 	     inflateEnd(&strm);
 	   }
-	   
+
          buf[read_index] = '\0';
+
          end_poll = apr_time_now();
          /* Parse the buffer */
          rval = process_xml(d, buf);
@@ -317,9 +318,9 @@ data_thread ( void *arg )
          random_factor = 1 + (SLEEP_RANDOMIZE / 50.0) * ((rand_r(&rand_seed) - RAND_MAX/2)/(float)RAND_MAX);
          elapsed = end - start;
          sleep_time = apr_time_from_sec(d->step) * random_factor - elapsed;
-         if(sleep_time > 0){
+         if(sleep_time > 0)
            apr_sleep(sleep_time);
-         }else{
+         else{
              ganglia_scoreboard_inc(DS_POLL_MISS);
          }
       }

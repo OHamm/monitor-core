@@ -360,11 +360,11 @@ write_data_to_carbon ( const char *source, const char *host, const char *metric,
                     const char *sum, unsigned int process_time )
 {
 
-        apr_time_t start = apr_time_now(), now;
-        int hostlen=strlen(host);
-        char hostcp[hostlen+1];
-        int sourcelen=strlen(source);
-        char sourcecp[sourcelen+1];
+       apr_time_t start = apr_time_now(), now;
+       int hostlen=strlen(host);
+       char hostcp[hostlen+1];
+       int sourcelen=strlen(source);
+       char sourcecp[sourcelen+1];
     int metriclen=strlen(metric);
     char metriccp[metriclen+1];
        char s_process_time[15];
