@@ -372,7 +372,7 @@ main ( int argc, char *argv[] )
    struct passwd *pw;
    gmetad_config_t *c = &gmetad_config;
    apr_interval_time_t sleep_time;
-   apr_time_t summary_started;
+   apr_time_t summary_started, now;
    double random_sleep_factor;
    unsigned int rand_seed;
 
@@ -626,8 +626,9 @@ main ( int argc, char *argv[] )
          hash_foreach(root.metric_summary, write_root_summary, NULL);
 
          /* Remember our last run */
-         ganglia_scoreboard_incby(METS_SUMRZ_DURATION, apr_time_now() - summary_started);
-         last_metadata = apr_time_now();//Updating global variable
+         now = apr_time_now();
+         last_metadata = now;//Updating global variable
+         ganglia_scoreboard_incby(METS_SUMRZ_DURATION, now - summary_started);
       }
 
    apr_pool_destroy(global_context);
