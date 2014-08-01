@@ -298,11 +298,7 @@ void initialize_scoreboard()
     ganglia_scoreboard_add(TIME_TCP_REQS_XML, GSB_COUNTER);
     ganglia_scoreboard_add(NBR_TCP_REQS_INTXML, GSB_COUNTER);
     ganglia_scoreboard_add(TIME_TCP_REQS_INTXML, GSB_COUNTER);
-    
-    /*
-     ganglia_scoreboard_add(INTER_LATENCY_TIME_ALL);"
-     ganglia_scoreboard_add(INTER_LATENCY__ALL);
-    */
+
 }
 
 static int
