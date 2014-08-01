@@ -595,7 +595,7 @@ main ( int argc, char *argv[] )
 #endif /* WITH_RIEMANN */
 
     /* Meta data */
-   last_metadata = apr_time_now();
+   last_metadata = apr_time_now();//Updating global variable
    for(;;)
       {
          /* Do at a random interval, between 
@@ -627,7 +627,7 @@ main ( int argc, char *argv[] )
 
          /* Remember our last run */
          ganglia_scoreboard_incby(METS_SUMRZ_DURATION, apr_time_now() - summary_started);
-         last_metadata = apr_time_now();
+         last_metadata = apr_time_now();//Updating global variable
       }
 
    apr_pool_destroy(global_context);

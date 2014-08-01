@@ -319,7 +319,7 @@ write_data_to_memcached ( const char *cluster, const char *host, const char *met
       debug_msg("Pushed %s value %s to the memcached server(s)", s_path, sum);
       memcached_pool_push(memcached_connection_pool, memc);
       now = apr_time_now();
-      last_memcached = now;
+      last_memcached = now;//Updating global variable
       ganglia_scoreboard_inc(METS_SENT_MEMCACHED);
       ganglia_scoreboard_inc(METS_SENT_ALL);
       ganglia_scoreboard_incby(METS_ALL_DURATION, now - start);
@@ -482,7 +482,7 @@ write_data_to_carbon ( const char *source, const char *host, const char *metric,
         now = apr_time_now();
         ganglia_scoreboard_incby(METS_ALL_DURATION, now - start);
         ganglia_scoreboard_incby(METS_GRAPHITE_DURATION, now - start);
-        last_graphite = now;
+        last_graphite = now;//Updating global variable
    return ret;
 }
 
@@ -636,7 +636,7 @@ send_event_to_riemann (Event *event)
    now = apr_time_now();
    ganglia_scoreboard_incby(METS_ALL_DURATION, now - start);
    ganglia_scoreboard_incby(METS_RIEMANN_DURATION, now - start);
-   last_riemann = now;
+   last_riemann = now;//Updating global variable
    return EXIT_SUCCESS;
 }
 
@@ -691,7 +691,7 @@ send_message_to_riemann (Msg *message)
    now = apr_time_now();
    ganglia_scoreboard_incby(METS_ALL_DURATION, now - start);
    ganglia_scoreboard_incby(METS_RIEMANN_DURATION, now - start);
-   last_riemann = now;
+   last_riemann = now;//Updating global variable
    return EXIT_SUCCESS;
 }
 

@@ -306,13 +306,13 @@ data_thread ( void *arg )
                end_poll = apr_time_now();
                ganglia_scoreboard_inc(DS_POLL_FAILED_REQS);
                ganglia_scoreboard_incby(DS_POLL_FAILED_DURATION, end_poll - start);
-               last_poll_failed = end_poll;
+               last_poll_failed = end_poll;//Updating global variable
             }
         else
 	    {
                ganglia_scoreboard_inc(DS_POLL_OK_REQS);
                ganglia_scoreboard_incby(DS_POLL_OK_DURATION, end_poll - start);
-               last_poll_ok = end_poll;
+               last_poll_ok = end_poll;//Updating global variable
             }
          g_tcp_socket_delete(sock);
 
