@@ -45,7 +45,6 @@ my_mkdir ( const char *dir )
 static int
 RRD_update_cached( char *rrd, const char *sum, const char *num, unsigned int process_time )
 {
-   //HERE
    apr_time_t now, start = apr_time_now();
    int *conn, c, r, off, l, to;
    char *cmd, *str, buf[1024];
