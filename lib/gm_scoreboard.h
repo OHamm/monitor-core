@@ -46,11 +46,6 @@ typedef enum ganglia_scoreboard_types ganglia_scoreboard_types;
 #define METS_SUMRZ_CLUSTER "mets_sumrz_cluster"
 #define METS_SUMRZ_DURATION "mets_sumrz_duration"
 
-/*
-#define INTER_LATENCY_TIME_ALL "gmetad_internal_latency_time_all"
-#define INTER_LATENCY__ALL "gmetad_internal_latency__all"
-*/
-
 /* predefined gmond scoreboard elements */
 #define PKTS_RECVD_ALL "gmond_pkts_recvd_all"
 #define PKTS_RECVD_FAILED "gmond_pkts_recvd_failed"
