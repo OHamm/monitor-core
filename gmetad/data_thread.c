@@ -301,16 +301,19 @@ data_thread ( void *arg )
          d->dead = 0;
 
        take_a_break:
-        if(d->dead){
-            end_poll = apr_time_now();
-            ganglia_scoreboard_inc(DS_POLL_FAILED_REQS);
-            ganglia_scoreboard_incby(DS_POLL_FAILED_DURATION, end_poll - start);
-            last_poll_failed = end_poll;
-        }else{
-            ganglia_scoreboard_inc(DS_POLL_OK_REQS);
-            ganglia_scoreboard_incby(DS_POLL_OK_DURATION, end_poll - start);
-            last_poll_ok = end_poll;
-        }
+        if(d->dead)
+	    {
+               end_poll = apr_time_now();
+               ganglia_scoreboard_inc(DS_POLL_FAILED_REQS);
+               ganglia_scoreboard_incby(DS_POLL_FAILED_DURATION, end_poll - start);
+               last_poll_failed = end_poll;
+            }
+        else
+	    {
+               ganglia_scoreboard_inc(DS_POLL_OK_REQS);
+               ganglia_scoreboard_incby(DS_POLL_OK_DURATION, end_poll - start);
+               last_poll_ok = end_poll;
+            }
          g_tcp_socket_delete(sock);
 
          end = apr_time_now();
@@ -320,9 +323,10 @@ data_thread ( void *arg )
          sleep_time = apr_time_from_sec(d->step) * random_factor - elapsed;
          if(sleep_time > 0)
            apr_sleep(sleep_time);
-         else{
-             ganglia_scoreboard_inc(DS_POLL_MISS);
-         }
+         else
+	     {
+                ganglia_scoreboard_inc(DS_POLL_MISS);
+             }
       }
    return NULL;
 }

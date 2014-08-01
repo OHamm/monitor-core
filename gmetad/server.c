@@ -1253,11 +1253,12 @@ server_thread (void *arg)
                close(client.fd);
                continue;
             }
-            else{
+         else
+	    {
                 afternow = apr_time_now();
                 ganglia_scoreboard_incby(TIME_TCP_REQS_ALL, afternow - now);//Port 8651
                 ganglia_scoreboard_incby(TIME_TCP_REQS_XML, afternow - now);
-         }
+            }
 
          if(root_report_end(&client))
             {
