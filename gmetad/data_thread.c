@@ -324,9 +324,7 @@ data_thread ( void *arg )
          if(sleep_time > 0)
            apr_sleep(sleep_time);
          else
-	     {
-                ganglia_scoreboard_inc(DS_POLL_MISS);
-             }
+           ganglia_scoreboard_inc(DS_POLL_MISS);
       }
    return NULL;
 }
