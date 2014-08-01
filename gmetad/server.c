@@ -663,6 +663,7 @@ status_report( client_t *client , char *callback)
       {
          return 1;
       }
+
    apr_time_t now = apr_time_now();
 
    offset = snprintf (buf, BUFSIZE,

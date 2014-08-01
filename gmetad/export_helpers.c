@@ -360,7 +360,6 @@ write_data_to_carbon ( const char *source, const char *host, const char *metric,
                     const char *sum, unsigned int process_time )
 {
 
-       apr_time_t start = apr_time_now(), now;
        int hostlen=strlen(host);
        char hostcp[hostlen+1];
        int sourcelen=strlen(source);
@@ -368,9 +367,10 @@ write_data_to_carbon ( const char *source, const char *host, const char *metric,
     int metriclen=strlen(metric);
     char metriccp[metriclen+1];
        char s_process_time[15];
-    char graphite_msg[ PATHSIZE + 1 ];
-    int i;
-    int ret;
+   char graphite_msg[ PATHSIZE + 1 ];
+   int i;
+   int ret;
+   apr_time_t start = apr_time_now(), now;
 
         /*  if process_time is undefined, we set it to the current time */
         if (!process_time) process_time = time(0);
@@ -383,7 +383,7 @@ write_data_to_carbon ( const char *source, const char *host, const char *metric,
 
 	/*prep the source name*/
    if (source) {
-           
+
                /* find and replace space for _ in the sourcename*/
                for(i=0; i<=sourcelen; i++){
                        if ( source[i] == ' ') {
@@ -391,9 +391,9 @@ write_data_to_carbon ( const char *source, const char *host, const char *metric,
                        }else{
                                sourcecp[i]=source[i];
                        }
-       }
+        }
                 sourcecp[i+1]=0;
-       }
+        }
 
 
    /* prep the host name*/
