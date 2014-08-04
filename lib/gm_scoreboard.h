@@ -21,27 +21,23 @@ typedef enum ganglia_scoreboard_types ganglia_scoreboard_types;
 #define METS_SENT_GRAPHITE "gmetad_metrics_sent_graphite"
 #define METS_SENT_MEMCACHED "gmetad_metrics_sent_memcached"
 #define METS_SENT_RIEMANN "gmetad_metrics_sent_riemann"
-
 #define METS_ALL_DURATION "mets_all_duration"
 #define METS_RRDTOOLS_DURATION "mets_rrdtools_duration"
 #define METS_RRDCACHED_DURATION "mets_rrdcached_duration"
 #define METS_GRAPHITE_DURATION "mets_graphite_duration"
 #define METS_MEMCACHED_DURATION "mets_memcached_duration"
 #define METS_RIEMANN_DURATION "mets_riemann_duration"
-
 #define DS_POLL_OK_REQS "ds_poll_ok_reqs"
 #define DS_POLL_OK_DURATION "ds_poll_ok_duration"
 #define DS_POLL_FAILED_REQS "ds_poll_failed_reqs"
 #define DS_POLL_FAILED_DURATION "ds_poll_failed_duration"
 #define DS_POLL_MISS "ds_poll_miss"
-
 #define NBR_TCP_REQS_ALL "nbr_tcp_reqs_all"
 #define TIME_TCP_REQS_ALL "time_tcp_reqs_all"
 #define NBR_TCP_REQS_XML "nbr_tcp_reqs_xml"
 #define TIME_TCP_REQS_XML "time_tcp_reqs_xml"
 #define NBR_TCP_REQS_INTXML "nbr_tcp_reqs_intxml"
 #define TIME_TCP_REQS_INTXML "time_tcp_reqs_intxml"
-
 #define METS_SUMRZ_ROOT "mets_sumrz_root"
 #define METS_SUMRZ_CLUSTER "mets_sumrz_cluster"
 #define METS_SUMRZ_DURATION "mets_sumrz_duration"

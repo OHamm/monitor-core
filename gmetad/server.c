@@ -22,7 +22,6 @@
 /*
  * These metrics are identical to gmond's metrics. (gmond -m)
  * If new metrics are added to gmond they can be added here.
- * 
  */
 #include "libmetrics.h"
 static const struct metricinfo
@@ -161,6 +160,7 @@ extern gmetad_config_t gmetad_config;
 extern char* getfield(char *buf, short int index);
 extern struct type_tag* in_type_list (char *, unsigned int);
 
+/* Global variables for metrics */
 extern apr_time_t started, last_poll_all, last_poll_ok, last_poll_failed, last_rrdtool, last_rrdcached, last_memcached, last_graphite, last_riemann, last_metadata;
 
 extern char hostname[HOSTNAMESZ];
@@ -963,7 +963,7 @@ status_report( client_t *client , char *callback)
    processOffset += snprintf (processBuf + (processOffset - 1), METRICSBUFSIZE > processOffset ? METRICSBUFSIZE - processOffset : 0, "},") - 1;
    systemOffset += snprintf (systemBuf + (systemOffset - 1), METRICSBUFSIZE > systemOffset ? METRICSBUFSIZE - systemOffset : 0, "},") - 1;
    otherOffset += snprintf (otherBuf + (otherOffset - 1), METRICSBUFSIZE > otherOffset ? METRICSBUFSIZE - otherOffset : 0, "},") - 1;
-   
+
    /*
     * The length depends on the name of the nest (see higher up).
     * If nothing was written then the buffer will look like: ' "example":}, ',
@@ -997,15 +997,15 @@ status_report( client_t *client , char *callback)
    if(otherOffset != 10){
       offset += snprintf (buf + offset, BUFSIZE > offset ? BUFSIZE - offset : 0, "%s", otherBuf);
    }
-   
+
    /*
     * Remove trailing "," and replace by what's needed, depending on the
     * existence of a callback function for the JSON data (see JSONP).
     */
    snprintf (buf + (offset - 1), BUFSIZE > offset - 1 ? BUFSIZE - (offset + 1) : 0,  callback != NULL ? "}})\r\n" : "}}\r\n");
-   
+
    /* End local metrics */
-   
+
    void *sbi = ganglia_scoreboard_iterator();
    while (sbi) {
       char *name = ganglia_scoreboard_next(&sbi);
