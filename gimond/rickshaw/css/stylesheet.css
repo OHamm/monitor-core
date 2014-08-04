@@ -14,6 +14,8 @@ h1 {
     font-family: Arial, sans-serif;
     font-size: 0.8em;
 }
+
+/* This css is mostly taken from rickshaw's examples */
 .container {
     box-sizing: border-box;
     width: 900px;
