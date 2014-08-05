@@ -288,12 +288,12 @@ void initialize_scoreboard()
     ganglia_scoreboard_add(METS_SUMRZ_ROOT, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SUMRZ_CLUSTER, GSB_COUNTER);
     ganglia_scoreboard_add(METS_SUMRZ_DURATION, GSB_COUNTER);
-    ganglia_scoreboard_add(NBR_TCP_REQS_ALL, GSB_COUNTER);
-    ganglia_scoreboard_add(TIME_TCP_REQS_ALL, GSB_COUNTER);
-    ganglia_scoreboard_add(NBR_TCP_REQS_XML, GSB_COUNTER);
-    ganglia_scoreboard_add(TIME_TCP_REQS_XML, GSB_COUNTER);
-    ganglia_scoreboard_add(NBR_TCP_REQS_INTXML, GSB_COUNTER);
-    ganglia_scoreboard_add(TIME_TCP_REQS_INTXML, GSB_COUNTER);
+    ganglia_scoreboard_add(TCP_REQS_ALL, GSB_COUNTER);
+    ganglia_scoreboard_add(TCP_REQS_ALL_DURATION, GSB_COUNTER);
+    ganglia_scoreboard_add(TCP_REQS_XML, GSB_COUNTER);
+    ganglia_scoreboard_add(TCP_REQS_XML_DURATION, GSB_COUNTER);
+    ganglia_scoreboard_add(TCP_REQS_INTXML, GSB_COUNTER);
+    ganglia_scoreboard_add(TCP_REQS_INTXML_DURATION, GSB_COUNTER);
 }
 
 static int
@@ -586,7 +586,7 @@ main ( int argc, char *argv[] )
 #endif /* WITH_RIEMANN */
 
     /* Meta data */
-   last_metadata = apr_time_now();//Updating global variable
+   last_metadata = apr_time_now();  //Updating global variable
    for(;;)
       {
          /* Do at a random interval, between 
@@ -618,7 +618,7 @@ main ( int argc, char *argv[] )
 
          /* Remember our last run */
          now = apr_time_now();
-         last_metadata = now;//Updating global variable
+         last_metadata = now;  //Updating global variable
          ganglia_scoreboard_incby(METS_SUMRZ_DURATION, now - summary_started);
       }
 

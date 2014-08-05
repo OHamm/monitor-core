@@ -782,12 +782,12 @@ status_report( client_t *client , char *callback)
        ganglia_scoreboard_get(METS_SUMRZ_ROOT),
        (long int)(ganglia_scoreboard_get(METS_SUMRZ_DURATION) / APR_TIME_C(1000)), // ms
        (long int)(last_metadata / APR_TIME_C(1000)), // ms
-       ganglia_scoreboard_get(NBR_TCP_REQS_ALL),
-       (long int)(ganglia_scoreboard_get(TIME_TCP_REQS_ALL) / APR_TIME_C(1000)), // ms
-       ganglia_scoreboard_get(NBR_TCP_REQS_INTXML),
-       (long int)(ganglia_scoreboard_get(TIME_TCP_REQS_INTXML) / APR_TIME_C(1000)), // ms
-       ganglia_scoreboard_get(NBR_TCP_REQS_XML),
-       (long int)(ganglia_scoreboard_get(TIME_TCP_REQS_XML) / APR_TIME_C(1000)), // ms
+       ganglia_scoreboard_get(TCP_REQS_ALL),
+       (long int)(ganglia_scoreboard_get(TCP_REQS_ALL_DURATION) / APR_TIME_C(1000)), // ms
+       ganglia_scoreboard_get(TCP_REQS_INTXML),
+       (long int)(ganglia_scoreboard_get(TCP_REQS_INTXML_DURATION) / APR_TIME_C(1000)), // ms
+       ganglia_scoreboard_get(TCP_REQS_XML),
+       (long int)(ganglia_scoreboard_get(TCP_REQS_XML_DURATION) / APR_TIME_C(1000)), // ms
        ganglia_scoreboard_get(DS_POLL_OK_REQS),
        (long int)(ganglia_scoreboard_get(DS_POLL_OK_DURATION) / APR_TIME_C(1000)), // ms
        (long int)(last_poll_ok / APR_TIME_C(1000)), // ms
@@ -1158,8 +1158,8 @@ server_thread (void *arg)
                pthread_mutex_lock(&server_interactive_mutex);
                SYS_CALL( client.fd, accept(interactive_socket->sockfd, (struct sockaddr *) &(client.addr), &len));
                pthread_mutex_unlock(&server_interactive_mutex);
-               ganglia_scoreboard_inc(NBR_TCP_REQS_ALL);
-               ganglia_scoreboard_inc(NBR_TCP_REQS_INTXML);
+               ganglia_scoreboard_inc(TCP_REQS_ALL);
+               ganglia_scoreboard_inc(TCP_REQS_INTXML);
                now = apr_time_now();
             }
          else
@@ -1167,8 +1167,8 @@ server_thread (void *arg)
                pthread_mutex_lock  ( &server_socket_mutex );
                SYS_CALL( client.fd, accept(server_socket->sockfd, (struct sockaddr *) &(client.addr), &len));
                pthread_mutex_unlock( &server_socket_mutex );
-               ganglia_scoreboard_inc(NBR_TCP_REQS_ALL);
-               ganglia_scoreboard_inc(NBR_TCP_REQS_XML);
+               ganglia_scoreboard_inc(TCP_REQS_ALL);
+               ganglia_scoreboard_inc(TCP_REQS_XML);
                now = apr_time_now();
             }
          if ( client.fd < 0 )
@@ -1213,8 +1213,8 @@ server_thread (void *arg)
 
                rc = process_request(&client, request);
                afternow = apr_time_now();
-               ganglia_scoreboard_incby(TIME_TCP_REQS_ALL, afternow - now);//Port 8652
-               ganglia_scoreboard_incby(TIME_TCP_REQS_INTXML, afternow - now);
+               ganglia_scoreboard_incby(TCP_REQS_ALL_DURATION, afternow - now);//Port 8652
+               ganglia_scoreboard_incby(TCP_REQS_INTXML_DURATION, afternow - now);
                if (rc == 1)
                   {
                      err_msg("Got a malformed path request from %s", remote_ip);
@@ -1230,7 +1230,7 @@ server_thread (void *arg)
             }
          else
             {
-                ganglia_scoreboard_inc(NBR_TCP_REQS_ALL);
+                ganglia_scoreboard_inc(TCP_REQS_ALL);
                 strcpy(request, "/");
             }
 
@@ -1256,8 +1256,8 @@ server_thread (void *arg)
          else
 	    {
                 afternow = apr_time_now();
-                ganglia_scoreboard_incby(TIME_TCP_REQS_ALL, afternow - now);//Port 8651
-                ganglia_scoreboard_incby(TIME_TCP_REQS_XML, afternow - now);
+                ganglia_scoreboard_incby(TCP_REQS_ALL_DURATION, afternow - now);//Port 8651
+                ganglia_scoreboard_incby(TCP_REQS_XML_DURATION, afternow - now);
             }
 
          if(root_report_end(&client))
