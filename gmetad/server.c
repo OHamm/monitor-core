@@ -405,6 +405,7 @@ root_report_start(client_t *client)
       {
          rc = xml_print(client, "HTTP/1.0 200 OK\r\n"
                                 "Server: gmetad/" GANGLIA_VERSION_FULL "\r\n"
+                                "Access-Control-Allow-Origin: *\n"
                                 "Content-Type: application/xml\r\n"
                                 "Connection: close\r\n"
                                 "\r\n");
