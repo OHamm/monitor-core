@@ -1,7 +1,11 @@
-Run
+Run in this order:
+
 rrdcreate.py, to create the database.
-rrdupdate.py, to update the database.
-This can be done via this command:
-while(true); do ./rrdupdate.py <ip> <port>; sleep 1m; done;
-or any other way you can find to update it every 1 min.
+
+rrdupdate.py <ip> <port>, to update the database.
+The ip and port are the ones for Gmetad's internal metrics daemon.
+Updating it at regular intervals can be done by using this command:
+./autoupdate.sh <ip> <port>
+or any other way you want!
+
 rrdgraphs.py, to draw the graphs.
