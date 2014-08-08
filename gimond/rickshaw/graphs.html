@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Gmetad's metrics using Rickshaw</title>
+        <link type="text/css" rel="stylesheet" href="css/stylesheet.css">
+        <script src="lib/d3.v3.js"></script>
+        <script src="lib/jquery-1.6.2.min.js"></script>
+        <script src="lib/rickshaw.js"></script>
+
+        <script>
+            var sent_data, sent_time_data, cpu_data, poll_data, poll_time_data, recv_data, sumrz_data, sumrz_time_data, req_data, req_time_data;
+            var palette = new Rickshaw.Color.Palette( { scheme: 'munin' } );
+            /*
+                metricsInternal is the graph update speed.
+                lastTimeInterval is the "Last" line update speed.
+            */
+            var metricsInterval = 60000, lastTimeInterval = 5000;//ms
+            var metricsTimerId = null, lastTimeTimerId = null;
+            var timespawn;
+            var tmpsentallvar, tmprrdtoolvar, tmprrdcachedvar, tmpgraphitevar, tmpmemcachedvar, tmpriemannvar;
+            var tmppollokvar, tmppollfailvar, tmpsumrzvar, tmpreqallvar, tmpinteractivevar, tmpxmlvar;
+            var tmprecvvar, tmpsumrzclustvar, tmpsumrzrootvar, tmppollmissvar;
+
+            function setVars(){
+                timespawn = retrieveDropVal("timespawn") * 60000; //mins
+                sent_data = [[], [], [], [], [], [], []];
+                sent_data[0] = [{color: palette.color(), data: sent_data[1], name: "All"}, {color: palette.color(), data: sent_data[2], name: "RRDtool"},
+                {color: palette.color(), data: sent_data[3], name: "RRDcached"}, {color: palette.color(), data: sent_data[4], name: "Graphite"},
+                {color: palette.color(), data: sent_data[5], name: "Memcached"}, {color: palette.color(), data: sent_data[6], name: "Riemann"}];
+
+                sent_time_data = [[], [], [], [], [], [], []];
+                sent_time_data[0] = [{color: palette.color(), data: sent_time_data[1], name: "All"}, {color: palette.color(), data: sent_time_data[2], name: "RRDtool"},
+                {color: palette.color(), data: sent_time_data[3], name: "RRDcached"}, {color: palette.color(), data: sent_time_data[4], name: "Graphite"},
+                {color: palette.color(), data: sent_time_data[5], name: "Memcached"}, {color: palette.color(), data: sent_time_data[6], name: "Riemann"}];
+
+                cpu_data = [[], [], [], [], []];
+                cpu_data[0] = [{color: palette.color(), data: cpu_data[1], name: "User"}, {color: palette.color(), data: cpu_data[2], name: "Nice"},
+                {color: palette.color(), data: cpu_data[3], name: "System"}, {color: palette.color(), data: cpu_data[4], name: "Idle"}];
+
+                poll_data = [[], [], [], []];
+                poll_data[0] = [{color: palette.color(), data: poll_data[1], name: "Ok"}, {color: palette.color(), data: poll_data[2], name: "Failed"},
+                {color: palette.color(), data: poll_data[3], name: "Misses"}];
+
+                poll_time_data = [[], [], []];
+                poll_time_data[0] = [{color: palette.color(), data: poll_time_data[1], name: "Ok"}, {color: palette.color(), data: poll_time_data[2], name: "Failed"}];
+
+                recv_data = [[], []];
+                recv_data[0] = [{color: palette.color(), data: recv_data[1], name: "Metrics/min"}];
+
+                sumrz_data = [[], [], []];
+                sumrz_data[0] = [{color: palette.color(), data: sumrz_data[1], name: "Cluster"}, {color: palette.color(), data: sumrz_data[2], name: "Root"}];
+
+                sumrz_time_data = [[], []];
+                sumrz_time_data[0] = [{color: palette.color(), data: sumrz_time_data[1], name: "Time"}];
+
+                req_data = [[], [], [], []];
+                req_data[0] = [{color: palette.color(), data: req_data[1], name: "All"}, {color: palette.color(), data: req_data[2], name: "Interactive"},
+                {color: palette.color(), data: req_data[3], name: "Xml"}];
+
+                req_time_data = [[], [], [], []];
+                req_time_data[0] = [{color: palette.color(), data: req_time_data[1], name: "All"}, {color: palette.color(), data: req_time_data[2], name: "Interactive"},
+                {color: palette.color(), data: req_time_data[3], name: "Xml"}];
+
+                tmpsentallvar = [0, 0]; tmprrdtoolvar = [0, 0];
+                tmprrdcachedvar = [0, 0]; tmpgraphitevar = [0, 0];
+                tmpmemcachedvar = [0, 0]; tmpriemannvar = [0, 0];
+                tmppollokvar = [0, 0]; tmppollfailvar = [0, 0];
+                tmprecvvar = 0;
+                tmpsumrzclustvar = 0; tmpsumrzrootvar = 0;
+                tmpsumrzvar = 0; tmpreqallvar = [0, 0];
+                tmpinteractivevar = [0, 0]; tmpxmlvar = [0, 0];
+                tmppollmissvar = 0;
+            }
+
+    function drawChart(name, metric_data){
+        $("#chart_"+name).empty();
+        $("#legend_"+name).empty();
+        $("#timeline_"+name).empty();
+        var last_time = metric_data[1][metric_data[1].length - 1].x - timespawn;
+        var i = 0;
+        for(;i<metric_data[1].length;i++){
+            if(last_time <= metric_data[1][i].x){
+                break;
+            }
+        }
+        for(var j=1; j<metric_data[0].length; j++){
+            metric_data[j].splice(0,i);//array is sorted!
+        }
+        var graph = new Rickshaw.Graph( {
+            element: document.getElementById('chart_'+name),
+            width: 900,
+            height: 120,
+            renderer: 'line',
+            interpolation: 'linear',
+            series: metric_data[0]
+        } );
+        graph.render();
+        var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+            graph: graph,
+            xFormatter: function(x) {
+                return new Date(x * 1000).toString();
+            }
+        } );
+        var legend = new Rickshaw.Graph.Legend( {
+            graph: graph,
+            element: document.getElementById('legend_'+name)
+        } );
+        var annotator = new Rickshaw.Graph.Annotate( {
+            graph: graph,
+            element: document.getElementById('timeline_'+name)
+        } );
+
+        var ticksTreatment = 'glow';
+        var xAxis = new Rickshaw.Graph.Axis.Time( {
+            graph: graph,
+            ticksTreatment: ticksTreatment,
+            timeFixture: new Rickshaw.Fixtures.Time.Local()
+        } );
+        xAxis.render();
+
+        var yAxis = new Rickshaw.Graph.Axis.Y( {
+            graph: graph,
+            tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+            ticksTreatment: ticksTreatment
+        } );
+        yAxis.render();
+    }
+
+        /* Two different ajax calls are needed here so that there are no conflicts */
+        function getMetrics(){
+            var Gmetad = "http://" + window.location.hostname + ":8652/status";
+            $.ajax({
+                type: "GET",
+                url: Gmetad,
+                dataType: "jsonp",
+                crossDomain: true,
+                contentType: "application/json",
+                jsonpCallback: "jsonCallback",
+                error: function(data, textStatus, jqXHR) { alert("Update crashed, please reload the page..."); console.log(textStatus + " " + jqXHR.responseText);}
+                /* If the logged error is "parsererror undefined", then the ajax() call couldn't parse the json data
+                because there was a conflict with another call to ajax(), and sometimes the metrics won't update anymore. */
+            });
+        }
+
+        function getLastTimes(){
+            var Gmetad = "http://" + window.location.hostname + ":8652/status";
+            $.ajax({
+                type: "GET",
+                url: Gmetad,
+                dataType: "jsonp",
+                crossDomain: true,
+                contentType: "application/json",
+                jsonpCallback: "last_timeCallback",
+                error: function(data, textStatus, jqXHR) { alert("Update crashed, please reload the page..."); console.log(textStatus + " " + jqXHR.responseText);}
+                /* If the logged error is "parsererror undefined", then the ajax() call couldn't parse the json data
+                because there was a conflict with another call to ajax(), and sometimes the metrics won't update anymore. */
+            });
+        }
+        function jsonCallback(data){
+                sent_data[1].push({x:data["stattime"]/1000, y:(tmpsentallvar[0] != 0 ? (data["metrics"]["sent"]["all"]["num"] - tmpsentallvar[0]) : 0)});
+                sent_data[2].push({x:data["stattime"]/1000, y:(tmprrdtoolvar[0] != 0 ? (data["metrics"]["sent"]["rrdtool"]["num"] - tmprrdtoolvar[0]) : 0)});
+                sent_data[3].push({x:data["stattime"]/1000, y:(tmprrdcachedvar[0] != 0 ? (data["metrics"]["sent"]["rrdcached"]["num"] - tmprrdcachedvar[0]) : 0)});
+                sent_data[4].push({x:data["stattime"]/1000, y:(tmpgraphitevar[0] != 0 ? (data["metrics"]["sent"]["graphite"]["num"] - tmpgraphitevar[0]) : 0)});
+                sent_data[5].push({x:data["stattime"]/1000, y:(tmpmemcachedvar[0] != 0 ? (data["metrics"]["sent"]["memcached"]["num"] - tmpmemcachedvar[0]) : 0)});
+                sent_data[6].push({x:data["stattime"]/1000, y:(tmpriemannvar[0] != 0 ? (data["metrics"]["sent"]["riemann"]["num"] - tmpriemannvar[0]) : 0)});
+                drawChart('Sent', sent_data);
+
+                sent_time_data[1].push({x:data["stattime"]/1000, y:(tmpsentallvar[1] != 0 ? (data["metrics"]["sent"]["all"]["totalMillis"] - tmpsentallvar[1]) : 0)});
+                sent_time_data[2].push({x:data["stattime"]/1000, y:(tmprrdtoolvar[1] != 0 ? (data["metrics"]["sent"]["rrdtool"]["totalMillis"] - tmprrdtoolvar[1]) : 0)});
+                sent_time_data[3].push({x:data["stattime"]/1000, y:(tmprrdcachedvar[1] != 0 ? (data["metrics"]["sent"]["rrdcached"]["totalMillis"] - tmprrdcachedvar[1]) : 0)});
+                sent_time_data[4].push({x:data["stattime"]/1000, y:(tmpgraphitevar[1] != 0 ? (data["metrics"]["sent"]["graphite"]["totalMillis"] - tmpgraphitevar[1]) : 0)});
+                sent_time_data[5].push({x:data["stattime"]/1000, y:(tmpmemcachedvar[1] != 0 ? (data["metrics"]["sent"]["memcached"]["totalMillis"] - tmpmemcachedvar[1]) : 0)});
+                sent_time_data[6].push({x:data["stattime"]/1000, y:(tmpriemannvar[1] != 0 ? (data["metrics"]["sent"]["riemann"]["totalMillis"] - tmpriemannvar[1]) : 0)});
+                drawChart('Sent_time', sent_time_data);
+
+                tmpsentallvar[0] = data["metrics"]["sent"]["all"]["num"];
+                tmprrdtoolvar[0] = data["metrics"]["sent"]["rrdtool"]["num"];
+                tmprrdcachedvar[0] = data["metrics"]["sent"]["rrdcached"]["num"];
+                tmpgraphitevar[0] = data["metrics"]["sent"]["graphite"]["num"];
+                tmpmemcachedvar[0] = data["metrics"]["sent"]["memcached"]["num"];
+                tmpriemannvar[0] = data["metrics"]["sent"]["riemann"]["num"];
+
+                tmpsentallvar[1] = data["metrics"]["sent"]["all"]["totalMillis"];
+                tmprrdtoolvar[1] = data["metrics"]["sent"]["rrdtool"]["totalMillis"];
+                tmprrdcachedvar[1] = data["metrics"]["sent"]["rrdcached"]["totalMillis"];
+                tmpgraphitevar[1] = data["metrics"]["sent"]["graphite"]["totalMillis"];
+                tmpmemcachedvar[1] = data["metrics"]["sent"]["memcached"]["totalMillis"];
+                tmpriemannvar[1] = data["metrics"]["sent"]["riemann"]["totalMillis"];
+
+                poll_data[1].push({x:data["stattime"]/1000, y:(tmppollokvar[0] != 0 ? (data["metrics"]["polls"]["ok"]["num"] - tmppollokvar[0]) : 0)});
+                poll_data[2].push({x:data["stattime"]/1000, y:(tmppollfailvar[0] != 0 ? (data["metrics"]["polls"]["failed"]["num"] - tmppollfailvar[0]) : 0)});
+                poll_data[3].push({x:data["stattime"]/1000, y:(tmppollmissvar != 0 ? (data["metrics"]["polls"]["misses"] - tmppollmissvar) : 0)});
+                drawChart('Polls_min', poll_data);
+
+                poll_time_data[1].push({x:data["stattime"]/1000, y:(tmppollokvar[1] != 0 ? (data["metrics"]["polls"]["ok"]["totalMillis"] - tmppollokvar[1]) : 0)});
+                poll_time_data[2].push({x:data["stattime"]/1000, y:(tmppollfailvar[1] != 0 ? (data["metrics"]["polls"]["failed"]["totalMillis"] - tmppollfailvar[1]) : 0)});
+                drawChart('Poll_time', poll_time_data);
+
+                tmppollokvar[0] = data["metrics"]["polls"]["ok"]["num"];
+                tmppollokvar[1] = data["metrics"]["polls"]["ok"]["totalMillis"];
+                tmppollfailvar[0] = data["metrics"]["polls"]["failed"]["num"];
+                tmppollfailvar[1] = data["metrics"]["polls"]["failed"]["totalMillis"];
+                tmppollmissvar = data["metrics"]["polls"]["misses"];
+
+                recv_data[1].push({x:data["stattime"]/1000, y:(tmprecvvar != 0 ? (data["metrics"]["received"]["all"] - tmprecvvar) : 0)});
+
+                tmprecvvar = data["metrics"]["received"]["all"];
+                drawChart('Received', recv_data);
+
+                sumrz_data[1].push({x:data["stattime"]/1000, y:(tmpsumrzclustvar != 0 ? (data["metrics"]["summarize"]["cluster"] - tmpsumrzclustvar) : 0)});
+                sumrz_data[2].push({x:data["stattime"]/1000, y:(tmpsumrzrootvar != 0 ? (data["metrics"]["summarize"]["root"] - tmpsumrzrootvar) : 0)});
+                drawChart('Summarizations_min', sumrz_data);
+
+                sumrz_time_data[1].push({x:data["stattime"]/1000, y:(tmpsumrzvar != 0 ? (data["metrics"]["summarize"]["totalMillis"] - tmpsumrzvar) : 0)});
+                drawChart('Summarize_time', sumrz_time_data);
+
+                tmpsumrzclustvar = data["metrics"]["summarize"]["cluster"];
+                tmpsumrzrootvar = data["metrics"]["summarize"]["root"];
+                tmpsumrzvar = data["metrics"]["summarize"]["totalMillis"];
+
+                req_data[1].push({x:data["stattime"]/1000, y:(tmpreqallvar[0] != 0 ? (data["metrics"]["requests"]["all"]["num"] - tmpreqallvar[0]) : 0)});
+                req_data[2].push({x:data["stattime"]/1000, y:(tmpinteractivevar[0] != 0 ? (data["metrics"]["requests"]["interactive"]["num"] - tmpinteractivevar[0]) : 0)});
+                req_data[3].push({x:data["stattime"]/1000, y:(tmpxmlvar[0] != 0 ? (data["metrics"]["requests"]["xml"]["num"] - tmpxmlvar[0]) : 0)});
+                drawChart('Requests', req_data);
+
+                req_time_data[1].push({x:data["stattime"]/1000, y:(tmpreqallvar[1] != 0 ? (data["metrics"]["requests"]["all"]["totalMillis"] - tmpreqallvar[1]) : 0)});
+                req_time_data[2].push({x:data["stattime"]/1000, y:(tmpinteractivevar[1] != 0 ? (data["metrics"]["requests"]["interactive"]["totalMillis"] - tmpinteractivevar[1]) : 0)});
+                req_time_data[3].push({x:data["stattime"]/1000, y:(tmpxmlvar[1] != 0 ? (data["metrics"]["requests"]["xml"]["totalMillis"] - tmpxmlvar[1]) : 0)});
+                drawChart('Requests_time', req_time_data);
+
+                tmpreqallvar[0] = data["metrics"]["requests"]["all"]["num"];
+                tmpreqallvar[1] = data["metrics"]["requests"]["all"]["totalMillis"];
+                tmpinteractivevar[0] = data["metrics"]["requests"]["interactive"]["num"];
+                tmpinteractivevar[1] = data["metrics"]["requests"]["interactive"]["totalMillis"];
+                tmpxmlvar[0] = data["metrics"]["requests"]["xml"]["num"];
+                tmpxmlvar[1] = data["metrics"]["requests"]["xml"]["totalMillis"];
+
+                cpu_data[1].push({x:data["stattime"]/1000, y:data["metrics"]["cpu"]["cpu_user"]});
+                cpu_data[2].push({x:data["stattime"]/1000, y:data["metrics"]["cpu"]["cpu_nice"]});
+                cpu_data[3].push({x:data["stattime"]/1000, y:data["metrics"]["cpu"]["cpu_system"]});
+                cpu_data[4].push({x:data["stattime"]/1000, y:data["metrics"]["cpu"]["cpu_idle"]});
+                drawChart('Cpu', cpu_data);
+            }
+
+            function retrieveDropVal(txt){
+                var e = document.getElementById(txt);
+                return e.options[e.selectedIndex].value;
+            }
+
+            function updateMetrics(){
+                if(document.getElementById("update").value == "Update"){
+                    document.getElementById("update").value = "Stop";
+                    $('#update').text("Stop");
+                    getMetrics();
+                    metricsTimerId = setInterval(getMetrics, metricsInterval);
+                }else{
+                    document.getElementById("update").value = "Update";
+                    $('#update').text("Update");
+                    setVars();
+                    clearTimeout(metricsTimerId);
+                    clearTimeout(lastTimeTimerId);
+                }
+            }
+
+            function changetimespawn(){
+                timespawn = retrieveDropVal("timespawn") * 60000; //mins
+            }
+
+            function begin(){
+                setVars();
+                lastTimeTimerId = setInterval(getLastTimes, lastTimeInterval);
+                getLastTimes();
+                updateMetrics();
+            }
+
+            function toSecondsAgo(val){
+                return (($.now() - val)/1000).toFixed(1);
+            }
+
+            function last_timeCallback(data){
+                /* 0 means no data received. */
+                $("#last_poll_ok").text((data["metrics"]["polls"]["ok"]["lastTime"] != 0 ?
+                            (toSecondsAgo(data["metrics"]["polls"]["ok"]["lastTime"]) > 1000 ? "> 15mins" : toSecondsAgo(data["metrics"]["polls"]["ok"]["lastTime"]) + "s" ) : "n/a"));
+                $("#last_poll_fail").text((data["metrics"]["polls"]["failed"]["lastTime"] != 0 ?
+                            (toSecondsAgo(data["metrics"]["polls"]["failed"]["lastTime"]) > 1000 ? "> 15mins" : toSecondsAgo(data["metrics"]["polls"]["failed"]["lastTime"]) + "s" ) : "n/a"));
+                $("#last_summary").text((data["metrics"]["summarize"]["lastTime"] != 0 ? toSecondsAgo(data["metrics"]["summarize"]["lastTime"]) + "s" : "n/a"));
+                $("#last_rrd").text((data["metrics"]["sent"]["rrdtool"]["lastTime"] != 0 ? toSecondsAgo(data["metrics"]["sent"]["rrdtool"]["lastTime"]) + "s" : "n/a"));
+                $("#last_rrdcached").text((data["metrics"]["sent"]["rrdcached"]["lastTime"] != 0 ? toSecondsAgo(data["metrics"]["sent"]["rrdcached"]["lastTime"]) + "s" : "n/a"));
+                $("#last_graphite").text((data["metrics"]["sent"]["graphite"]["lastTime"] != 0 ? toSecondsAgo(data["metrics"]["sent"]["graphite"]["lastTime"]) + "s" : "n/a"));
+                $("#last_memcached").text((data["metrics"]["sent"]["memcached"]["lastTime"] != 0 ? toSecondsAgo(data["metrics"]["sent"]["memcached"]["lastTime"]) + "s" : "n/a"));
+                $("#last_riemann").text((data["metrics"]["sent"]["riemann"]["lastTime"] != 0 ? toSecondsAgo(data["metrics"]["sent"]["riemann"]["lastTime"]) + "s" : "n/a"));
+            }
+            $(document).ready(function() {
+                begin();
+            });
+        </script>
+    </head>
+    <body>
+        <div id="buttons">
+            <button type="button" id="update" value="Update" onclick="updateMetrics()">Update</button>
+            <label>
+                <select id="timespawn" onchange="changetimespawn()">
+                    <option value=10>10</option>
+                    <option value=20>20</option>
+                    <option value=30>30</option>
+                    <option value=60>60</option>
+                    <option value=120>120</option>
+                </select>
+                Timespawn (min)
+            </label>
+        </div>
+
+        <!-- Last Times -->
+        <table class='lasts'>
+            <tr>
+            <td>Last Poll Ok:</td>
+            <td width=55px><span id="last_poll_ok">...</span></td>
+            <td>Poll Failed:</td>
+            <td width=55px><span id="last_poll_fail">...</span></td>
+            <td>Summary:</td>
+            <td width=55px><span id="last_summary">...</span></td>
+            <td>RRD:</td>
+            <td width=55px><span id="last_rrd">...</span></td>
+            <td>RRDcached:</td>
+            <td width=55px><span id="last_rrdcached">...</span></td>
+            <td>Graphite:</td>
+            <td width=55px><span id="last_graphite">...</span></td>
+            <td>Memcached:</td>
+            <td width=55px><span id="last_memcached">...</span></td>
+            <td>Riemann:</td>
+            <td width=55px><span id="last_riemann">...</span></td>
+            </tr>
+        </table>
+        <!--End Last Times -->
+
+        <!-- Graphs -->
+        <div class="container">
+            <div id="Polls_min" class="placeholder">
+                <h1>Polls/min</h1>
+                <div id="legend_Polls_min"></div>
+                <div id="chart_Polls_min"></div>
+                <div id="timeline_Polls_min"></div>
+            </div>
+            <div id="Received" class="placeholder">
+                <h1>Received</h1>
+                <div id="legend_Received"></div>
+                <div id="chart_Received"></div>
+                <div id="timeline_Received"></div>
+            </div>
+            <div id="Summarizations_min" class="placeholder">
+                <h1>Summarizations/min</h1>
+                <div id="legend_Summarizations_min"></div>
+                <div id="chart_Summarizations_min"></div>
+                <div id="timeline_Summarizations_min"></div>
+            </div>
+            <div id="Sent" class="placeholder">
+                <h1>Sent</h1>
+                <div id="legend_Sent"></div>
+                <div id="chart_Sent"></div>
+                <div id="timeline_Sent"></div>
+            </div>
+            <div id="Requests" class="placeholder">
+                <h1>Requests</h1>
+                <div id="legend_Requests"></div>
+                <div id="chart_Requests"></div>
+                <div id="timeline_Requests"></div>
+            </div>
+            <div id="Poll_time" class="placeholder">
+                <h1>Poll time</h1>
+                <div id="legend_Poll_time"></div>
+                <div id="chart_Poll_time"></div>
+                <div id="timeline_Poll_time"></div>
+            </div>
+            <div id="Sent_time" class="placeholder">
+                <h1>Sent time</h1>
+                <div id="legend_Sent_time"></div>
+                <div id="chart_Sent_time"></div>
+                <div id="timeline_Sent_time"></div>
+            </div>
+            <div id="Summarize_time" class="placeholder">
+                <h1>Summarize time</h1>
+                <div id="legend_Summarize_time"></div>
+                <div id="chart_Summarize_time"></div>
+                <div id="timeline_Summarize_time"></div>
+            </div>
+            <div id="Requests_time" class="placeholder">
+                <h1>Requests time</h1>
+                <div id="legend_Requests_time"></div>
+                <div id="chart_Requests_time"></div>
+                <div id="timeline_Requests_time"></div>
+            </div>
+            <div id="Cpu" class="placeholder">
+                <h1>Cpu</h1>
+                <div id="legend_Cpu"></div>
+                <div id="chart_Cpu"></div>
+                <div id="timeline_Cpu"></div>
+            </div>
+        </div>
+        <!--End Graphs -->
+    </body>
+</html>
