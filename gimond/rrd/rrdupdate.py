@@ -6,7 +6,7 @@ import sys
 import rrdtool
 
 def main():
-	print "Settings:\n\tip:", sys.argv[1], "\n\tport:", sys.argv[2]
+	print "Update settings:\n\tip:", sys.argv[1], "\n\tport:", sys.argv[2]
 	ip = sys.argv[1]
 	port = int(sys.argv[2])
 	bufsize = 4096
